@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
 <meta charset="UTF-8">
-  	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css" th:href="@{/CSS/mystyle.css}" />
-    <script src="JS/utils.js" charset="utf-8" defer></script>
-	<script src="JS/loginManager.js" charset="utf-8" defer></script>
-	<script src="JS/registerManager.js" charset="utf-8" defer></script>
-   
+  	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
     <title>LandingPage</title>
     
+    <script src="registerManager.js" charset="utf-8" defer></script>
+    <script src="loginManager.js" charset="utf-8" defer></script>
+    <script src="utils.js" charset="utf-8" defer></script>
+       
 </head>
 <body>
 	<header>
@@ -18,31 +18,34 @@
 	</header>
 	
 	<div class="container">
-		<div class="form-column">
-		    <form action="#" id="loginForm">
+	
+        <div class="form-column">
+		    <form action="LoginController" method="POST">
 	            <fieldset>
 					Username: <input type="text" name="username" required> <br>
 					Password: <input type="password" name="password" required><br>
-	                <input id="loginButton" type="button" value="Login">
-	                <p id="errorMessage"></p>
+	                <input id="loginbutton" type="submit" value="login">
+	                <p id="loginerrormessage"></p>   
 	            </fieldset>
 		    </form>
-		</div>
-		
-		<div class="form-column">
-			<form action="#"><div class="text-column">
-				<fieldset>
+		    </div>	
+		    
+		    <div class="form-column">
+			<form action="RegisterController" method="POST">
+				<div class="text-column">
 					Name: <input type="text" name="name" required><br>
 					Surname: <input type="text" name="surname" required><br>
 					Username: <input type="text" name="username" required><br>
 					Email: <input type="email" name="email" required><br>
-					Password: <input type="password" name="password" required><br>
-					Confirm Password: <input type="password" name="confirmPassword" required><br>
-					<input id="registerButton" type="button" value="register">
-					<p id="errorMessage1"></p>
-				</fieldset></div>
+					Password: <input type="password" name="password" id="password" required><br>
+					Confirm Password: <input type="password" name="confirmPassword" id="confirmPassword" required><br>
+				</div>
+	            <input id="registerbutton" type="submit" value="register">
+				<p id="registererrormessage"></p> 
 			</form>
 		</div>
-	</div>	
+	</div>
+		
 </body>
 </html>
+

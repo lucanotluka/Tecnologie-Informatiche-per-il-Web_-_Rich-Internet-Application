@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +23,10 @@ import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 @WebServlet("/RegisterController")
+@MultipartConfig
 public class RegisterController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	 private TemplateEngine templateEngine;
 	
 	
     public RegisterController() {
@@ -35,16 +36,12 @@ public class RegisterController extends HttpServlet {
 
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
+		System.out.println("Arrived in RegisterController");
+		
 		String username = null;
         String email = null;
     	String name = null;
@@ -68,7 +65,9 @@ public class RegisterController extends HttpServlet {
 			}
 		} catch (Exception e) {
 			// for debugging only e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or incorrect credential value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("[RegisterController]: Missing or incorrect credential value");
+			
 			return;
 		}
 		
@@ -81,10 +80,12 @@ public class RegisterController extends HttpServlet {
         	if(!isUnique)
         		throw new Exception("Non-unique username or password");
         } catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not Possible to check unicity of username and email");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not Possible to check unicity of username and email");
 			return;
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Non-unique username or password");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Non-unique username or password");
 			return;
 		}
         
@@ -98,20 +99,18 @@ public class RegisterController extends HttpServlet {
     		if(success) {
     			
     			// REGISTRATION SUCCESS message
-    			
-    			ServletContext servletContext = getServletContext();
-    			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-    			ctx.setVariable("successMsg", "Registration correctly done!");
-    			String path = "/LandingPage.html";
-    			templateEngine.process(path, ctx, response.getWriter());
+    			response.setStatus(HttpServletResponse.SC_OK);
+    			response.getWriter().println("User successfully registered!");
     		}
     		else { // if not successful, throws sql exception
-    			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not Possible to register User");    			
-       			return;
+    			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);    			
+    			response.getWriter().println("Not Possible to register User");
+    			return;
     		}
     			
    		} catch (SQLException e) {
-   			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not Possible to register User");    			
+   			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);    			
+			response.getWriter().println("Not Possible to register User");
    			return;
     	}
 

@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.servlet.annotation.WebServlet;
+import org.apache.commons.lang.StringEscapeUtils;
+
 import javax.servlet.annotation.MultipartConfig;
 
 
@@ -38,10 +39,11 @@ public class LoginController extends HttpServlet {
 		String username = null;
 		String password = null;
 
-		System.out.println("Arrived in LoginController");		
+		System.out.println("Arrived in LoginController");	
+		
 		try {
-			username = request.getParameter("username");
-			password = request.getParameter("password");
+			username = StringEscapeUtils.escapeJava(request.getParameter("username"));
+			password = StringEscapeUtils.escapeJava(request.getParameter("password"));
 			
 			if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
 				throw new Exception("Missing or empty credential value");
@@ -49,7 +51,7 @@ public class LoginController extends HttpServlet {
 		} catch (Exception e) {
 			// for debugging only e.printStackTrace();
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//response.getWriter().println("[LoginController]: Missing credential value");
+			response.getWriter().println("[LoginController]: Missing credential value");
 			return;
 		}
         

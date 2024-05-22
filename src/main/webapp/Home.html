@@ -1,88 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Home</title>
-<link rel="stylesheet" type="text/css" media="all" href="../CSS/mystyle.css" th:href="@{/CSS/mystyle.css}" />
-    
+	<meta charset="UTF-8">
+	<title>Home</title>
+	<script src="utils.js" charset="utf-8" defer></script>
+	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
 </head>
 <body>
 
 	<div align="right">
-		<a th:href="@{/Logout}">Logout</a>
-	</div>
-	<h1> // Welcome home</h1><h2 th:text="${session.user.name + ' ' + session.user.surname}"></h2>
+		<a href="Logout">Logout</a>
+	</div>	
+	<h1> // Welcome home</h1><h2><span id="id_username"></span></h2>
 
 
-
-<table>
-
-<thead><tr>
-	<th><h3> // Your groups </h3></th>
-	<th><h3> // Your invitations </h3></th>
-</tr></thead>
-
-<tbody><tr>
+	<table>
+		<tr>
+			<td> <h3> // My Groups </h3>
+				<table id="myTable">
+					<thead>
+						<tr> <th>Title</th> <th>Creation Date</th> <th>Participants</th> <th>Details</th> </tr>
+					</thead>
+					<tbody id="myTableBody"> </tbody>
+				
+				</table>
+			</td>
+			<td> <h3> // My Invitations </h3>
+				<table>
+					<thead id="othersTable">
+						<tr> <th>Title</th> <th>Creation Date</th> <th>Creator</th> <th>Details</th> </tr>
+					</thead>
+					<tbody id="othersTableBody"> </tbody>
+				</table>
+			</td>
+		</tr>
+	</table>
 	
-	<td  class="form-column" >
-	
-	<div th:if="${myGroups.size() > 0}">
-		<table>
+	<aside>
+		<h3> // Group Details </h3>
+		<table id="groupDetails">
 			<thead>
-				<tr>
-					<th>Title</th>
-					<th>Creation Date</th>
-					<th>Participants</th>
-					<th>Link</th>
-				</tr>
+				<tr> <th>Title</th> <th>Creator</th> <th>Creation Date</th> 
+				<th>Duration</th> <th>Max participants</th> <th>Min participants</th> </tr>
 			</thead>
-			<tbody>
-				<tr th:each="g : ${myGroups}">
-					<td th:text="${g.title}"></td>
-					<td th:text="${ g.creationDate }"></td>
-					<td th:text="${ g.participants.size() +1 }"></td>
-					<td><a th:href="@{/GetGroupDetails(groupid=${g.ID})}">Details</a></td>
-				</tr>
-			</tbody>
+			<tbody id="groupDetailsBody"> </tbody>
+		
 		</table>
-	</div>  
-	<div th:if="${myGroups.size() == 0}"> You havent any active group. </div>
+	</aside>
 	
-	</td>
-	<td  class="form-column" >
-
-	<div th:if="${othersGroups.size() >0}">
-		<table>
-			<thead>
-				<tr>
-					<th>Title</th>
-					<th>Creation Date</th>
-					<th>Creator</th>
-					<th>Link</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="g : ${othersGroups}">
-					<td th:text="${g.title}"></td>
-					<td th:text="${ g.creationDate }"></td>
-					<td th:text="${ g.creator }"></td>
-					<td><a th:href="@{/GetGroupDetails(groupid=${g.ID})}">Details</a></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>  
-	<div th:if="${othersGroups.size() == 0}"> You havent been invited to any active group. </div>
-
-</td>
-
-</tr></tbody>
-
-</table>
-
 
 	<h3> // Create a new group! </h3>
 	<div>
-		<form action="#" th:action="@{/CreateGroup}" method="POST">
+		<form action="#" method="POST">
 			<fieldset>
 				<p>
 					Group Title: <input type="text" name="title" required />
