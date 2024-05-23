@@ -79,11 +79,10 @@ public class LoginController extends HttpServlet {
 		
 		// ELSE: EVERYTHING OK!
 		request.getSession().setAttribute("username", username);
-		
+		response.getWriter().println(username);
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		response.getWriter().println(username);
 		
 	}
 	
