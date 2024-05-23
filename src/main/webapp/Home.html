@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Home</title>
 	<script src="utils.js" charset="utf-8" defer></script>
+	<script src="homeManager.js" charset="utf-8" defer></script>
 	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
 </head>
 <body>
@@ -14,9 +15,9 @@
 	<h1> // Welcome home</h1><h2><span id="id_username"></span></h2>
 
 
-	<table>
+	<table class="container">
 		<tr>
-			<td> <h3> // My Groups </h3>
+			<td class="form-column"> <h3> // My Groups </h3>
 				<table id="myTable">
 					<thead>
 						<tr> <th>Title</th> <th>Creation Date</th> <th>Participants</th> <th>Details</th> </tr>
@@ -25,7 +26,7 @@
 				
 				</table>
 			</td>
-			<td> <h3> // My Invitations </h3>
+			<td class="form-column"> <h3> // My Invitations </h3>
 				<table>
 					<thead id="othersTable">
 						<tr> <th>Title</th> <th>Creation Date</th> <th>Creator</th> <th>Details</th> </tr>
@@ -34,19 +35,24 @@
 				</table>
 			</td>
 		</tr>
+		
+		<tr class="form-column">
+			<td>
+				<h3> // Group Details </h3>
+				<table id="groupDetails">
+					<thead>
+						<tr> <th>Title</th> <th>Creator</th> <th>Creation Date</th> 
+						<th>Duration</th> <th>Max participants</th> <th>Min participants</th> </tr>
+					</thead>
+					<tbody id="groupDetailsBody"> </tbody>
+				
+				</table>
+			</td>
+		</tr>
+		
 	</table>
 	
-	<aside>
-		<h3> // Group Details </h3>
-		<table id="groupDetails">
-			<thead>
-				<tr> <th>Title</th> <th>Creator</th> <th>Creation Date</th> 
-				<th>Duration</th> <th>Max participants</th> <th>Min participants</th> </tr>
-			</thead>
-			<tbody id="groupDetailsBody"> </tbody>
-		
-		</table>
-	</aside>
+
 	
 
 	<h3> // Create a new group! </h3>
@@ -57,21 +63,19 @@
 					Group Title: <input type="text" name="title" required />
 				</p>
 				<p>
-					Start Day: <input type="date" name="date"
-						th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
-						placeholder="yyyy-mm-dd" required />
+					Start Day: <input type="date" name="date" placeholder="yyyy-mm-dd" required />
 				</p>
 				<p>
 					Duration (in days): <input type="number" name="duration" min=0 required />
 				</p>
 				<p>
-					Minimum participants: <input type="number" name="minParts" min=0 required />
+					Minimum participants: <input type="number" name="minParts" min=0 id="minPartsForm" required />
 				</p>
 				<p>
-					Maximum participants: <input type="number" name="maxParts" min=1 required />
+					Maximum participants: <input type="number" name="maxParts" min=1 id="maxPartsForm" required />
 				</p>
-
-				<input type="submit" name="Send">
+				<p id="formErrMsg"></p> 
+				<input id="newGroupForm" type="submit" name="Send">
 			</fieldset>
 		</form>
 	</div>
