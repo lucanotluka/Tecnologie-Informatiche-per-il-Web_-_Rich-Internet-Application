@@ -1,0 +1,43 @@
+Alcuni appunti NON ordinati:
+	1. Lato server, il 90% sarà eguale, forse soltanto
+		i Getter ritorneranno non strutture dati,
+		bensi JSON attachati alla HTTPRequest.
+	2. AJAX vuole l'utilizzo della chiamata asincrona
+		nella funzione makeCall().
+	3. Implemento un oggetto che funge da Orchestratore:
+		interagisce con i vari oggetti di pagina dopo il load,
+		ogni interazione col server, ogni cambio vista.
+		Interagisce dunque coi componenti:
+			a. Componente lista: interagirà con una lista di dati,
+				da interpretare come lista crescente.
+			b. Componente div: interagirà con la vista, mostrando o
+				nascondendo, printando o meno.
+	4. Disegnando ad hoc il sito dinamico, inizio a comprendere
+		le funzioni JS necessarie e modulari.
+		Fai una lista dei Componenti, con le funzionalità
+		che presentano.
+		
+	5. Il prof suggerisce:
+		- quando inizi a scrivere codice, scrivi i primi 
+		moduli dei componenti: le liste, i div, i form
+		- com'e' il componente? che cosa fa? e' data driven?
+		- scrivi le azioni che devono essere eseguite!
+		- per i componenti interattivi, associo il registerEvent,
+			che permette l'interattività tra oggetto (bottone, 
+			sumbit, link), ed evento
+			
+			ATTENZIONE per gli elementi interattivi già noti
+			a coding time possono essere registrati per gli eventi!
+			INVECE l'UPDATE delle cose dinamicamente compilate
+			deve essere creato al momento del fetching dei dati:
+			l'ancoraggio tra elemento ed evento deve essere fatto
+			con il fetch del dato dal Server.
+	6. Tornando sulla questione Orchestratore, esso e' un Main:
+		gestisce, come un framework, l'interazione e il computo
+		dei contenuti per tutta la durata dell'interazione.
+		Vi saranno dunque:
+			- Inizio: start(), crea i widget e registra gli eventi
+			- Continuo: refresh(), per visualizzare i contenuti
+				appena aggiornati
+			
+			
