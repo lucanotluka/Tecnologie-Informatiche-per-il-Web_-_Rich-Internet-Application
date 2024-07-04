@@ -2,7 +2,7 @@
  * Login management
  */
 
-/*
+
 (function() { // avoid variables ending up in the global scope
 
   document.getElementById("loginbutton").addEventListener('click', (e) => {
@@ -35,6 +35,7 @@
 	          }
         }
       );
+    
     } else {
     	form.reportValidity();
     	return false;
@@ -42,4 +43,3 @@
   });
   
 })();
-*/

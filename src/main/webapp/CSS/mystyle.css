@@ -30,7 +30,7 @@ header {
 }
 
 
-input[type="submit"] {
+input[type="button"] {
     background-color: #3CBC8D;
     color: white; 
     border: none;

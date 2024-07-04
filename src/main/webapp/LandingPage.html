@@ -5,6 +5,7 @@
   	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
     <title>LandingPage</title>
     
+    <script src="loginManager.js" charset="utf-8" defer></script>
     <script src="registerManager.js" charset="utf-8" defer></script>
     <script src="utils.js" charset="utf-8" defer></script>
        
@@ -19,29 +20,30 @@
 	<div class="container">
 	
         <div class="form-column">
-		    <form action="LoginController"  method="POST" id="loginForm">
+		    <form action="#" id="loginForm">
 	            <fieldset>
 					Username: <input type="text" name="username" required> <br>
 					Password: <input type="password" name="password" required><br>
-	                <input id="loginbutton" type="submit" value="login">
+	                <input id="loginbutton" type="button" value="login">
 	                <p id="loginerrormessage"></p>   
 	            </fieldset>
 		    </form>
 		    </div>	
 		    
 		    <div class="form-column">
-			<form action="RegisterController" method="POST">
+			<form action="#" id="registerForm">
+			<fieldset>
 				<div class="text-column">
-					Name: <input type="text" name="name" required><br>
-					Surname: <input type="text" name="surname" required><br>
-					Username: <input type="text" name="username" required><br>
-					Email: <input type="email" name="email" required><br>
-					Password: <input type="password" name="password" id="password" required><br>
-					Confirm Password: <input type="password" name="confirmPassword" id="confirmPassword" required><br>
+					Name: <input type="text" name="name" ><br>
+					Surname: <input type="text" name="surname" ><br>
+					Username: <input type="text" name="username" ><br>
+					Email: <input type="email" name="email" ><br>
+					Password: <input type="password" name="password" id="password" ><br>
+					Confirm Password: <input type="password" name="confirmPassword" id="confirmPassword" ><br>
 				</div>
-	            <input id="registerbutton" type="submit" value="register">
+	            <input id="registerbutton" type="button" value="register">
 				<p id="registererrormessage"></p> 
-			</form>
+			</fieldset></form>
 		</div>
 	</div>
 		

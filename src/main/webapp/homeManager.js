@@ -11,12 +11,17 @@
 		// PRIMISSIMA COSA DA GESTIRE E FARE AAAAAAAAAAAAAAAAAAAA	 								1.
 	  window.addEventListener("load", () => {
 	    if (sessionStorage.getItem("username") == null) {
-	      window.location.href = "index.html";
+	      window.location.href = "LandingPage.html";
 	    } else {
 	      pageOrchestrator.start(); // initialize the components
 	      pageOrchestrator.refresh();
 	    } // display initial content
 	  }, false);
+
+
+
+
+
 
 
 	   // la funzione DEFINITIVA TOTALE SUPREMA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -76,6 +81,10 @@
 	      wizard.reset();
 	    };
 	  }
+	  
+	  
+	  
+	  
 	  
 	  
 	  
