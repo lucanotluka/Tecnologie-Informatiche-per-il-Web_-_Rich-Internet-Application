@@ -31,7 +31,6 @@ import it.polimi.tiw.utils.ConnectionHandler;
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
 
 
     public HomeController() {
@@ -40,12 +39,6 @@ public class HomeController extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
@@ -119,15 +112,6 @@ public class HomeController extends HttpServlet {
 
 
 
-    	// Redirect to the Home page
-    	// and add Groups to the parameters!!
-
-		String path = "/WEB-INF/Home.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("myGroups", myGroups);
-		ctx.setVariable("othersGroups", othersGroups);
-		templateEngine.process(path, ctx, response.getWriter());
     }
 
 

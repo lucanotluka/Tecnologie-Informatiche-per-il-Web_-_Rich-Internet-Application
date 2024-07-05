@@ -5,9 +5,9 @@
   	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
     <title>LandingPage</title>
     
-    <script src="loginManager.js" charset="utf-8" defer></script>
+	<script src="loginManager.js" charset="utf-8" defer></script>
     <script src="registerManager.js" charset="utf-8" defer></script>
-    <script src="utils.js" charset="utf-8" defer></script>
+    <script src="utils.js" charset="utf-8" defer></script> 
        
 </head>
 <body>
@@ -20,10 +20,10 @@
 	<div class="container">
 	
         <div class="form-column">
-		    <form action="#" id="loginForm">
+		    <form action="LoginController" method="POST" id="loginForm">
 	            <fieldset>
-					Username: <input type="text" name="username" required> <br>
-					Password: <input type="password" name="password" required><br>
+					Username: <input type="text" name="username"> <br>
+					Password: <input type="password" name="password"><br>
 	                <input id="loginbutton" type="button" value="login">
 	                <p id="loginerrormessage"></p>   
 	            </fieldset>
@@ -31,7 +31,7 @@
 		    </div>	
 		    
 		    <div class="form-column">
-			<form action="#" id="registerForm">
+			<form action="RegisterController" method="POST" id="registerForm">
 			<fieldset>
 				<div class="text-column">
 					Name: <input type="text" name="name" ><br>

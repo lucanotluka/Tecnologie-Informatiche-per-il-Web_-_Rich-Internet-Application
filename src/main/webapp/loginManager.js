@@ -13,12 +13,13 @@
 		document.getElementById('loginerrormessage').textContent = 'Trying to login...';
      	
      	// AJAX REQUEST!
-     	makeCall("POST", 'Login', document.getElementById('loginForm'),
+     	makeCall("POST", 'LoginController', document.getElementById('loginForm'),
         	function(x) {
 	          if (x.readyState == XMLHttpRequest.DONE) {
 	            var message = x.responseText;
 	            switch (x.status) {
 	              case 200:
+					 document.getElementById("loginerrormessage").textContent = 'Login successful!';
 	            	sessionStorage.setItem('username', message);
 	                window.location.href = "Home.html";
 	                break;

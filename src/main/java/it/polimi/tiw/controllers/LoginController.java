@@ -72,11 +72,11 @@ public class LoginController extends HttpServlet {
 		if (user == null) {
 
 			// Error messages
-			ServletContext servletContext = getServletContext();
-			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-			ctx.setVariable("errorMsg", "Incorrect username or password");
-			path = "/LandingPage.html";
-			templateEngine.process(path, ctx, response.getWriter());
+			
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not Possible to check credentials");
+			return;
+			
 
 		} else {
 			// Create a Session for the User
