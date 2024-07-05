@@ -5,7 +5,7 @@
     document.getElementById("registerbutton").addEventListener('click', (e) => {
    	   e.preventDefault();
    	  
-   	  	let form = e.target.closest("form");
+   	  	var form = e.target.closest("form");
     
     	if (form.checkValidity()) {
 		   	  const password = document.getElementById('password').value;
@@ -13,7 +13,7 @@
 		   	  
 		   	  if (password !== confirmPassword) {
 		   	    document.getElementById('registererrormessage').textContent = 'Passwords do not match!';
-		   	    return false; // Prevent form submission
+		   	    return; // Prevent form submission
 		   	  } 
 
 		   	       	

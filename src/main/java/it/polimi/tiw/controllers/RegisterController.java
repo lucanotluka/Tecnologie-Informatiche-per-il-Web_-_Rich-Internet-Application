@@ -27,12 +27,10 @@ public class RegisterController extends HttpServlet {
     }
 
 
-	@Override
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
-	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String username = null;

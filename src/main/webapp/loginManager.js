@@ -6,16 +6,23 @@
 (function() { // avoid variables ending up in the global scope
 
   document.getElementById("loginbutton").addEventListener('click', (e) => {
-    
-    let form = document.getElementById('loginForm');
+    e.preventDefault();
+    var form = e.target.closest("form");
     
     if (form.checkValidity()) {
+		
 		document.getElementById('loginerrormessage').textContent = 'Trying to login...';
      	
      	// AJAX REQUEST!
-     	makeCall("POST", 'LoginController', document.getElementById('loginForm'),
+            console.log("Sending AJAX request");
+     	
+     	// AJAX REQUEST!
+     	makeCall("POST", 'LoginController', e.target.closest("form"),
         	function(x) {
 	          if (x.readyState == XMLHttpRequest.DONE) {
+				 
+				 console.log("AJAX response received"); 
+				 
 	            var message = x.responseText;
 	            switch (x.status) {
 	              case 200:
@@ -34,12 +41,10 @@
 	                break;
 	            }
 	          }
-        }
-      );
-    
+	        }
+	      );
     } else {
     	form.reportValidity();
-    	return false;
     }
   });
   
