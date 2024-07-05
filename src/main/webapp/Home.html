@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Home</title>
 	<script src="homeManager.js" charset="utf-8" defer></script>
+	<script src="utils.js" charset="utf-8" defer></script>
 	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
 </head>
 <body>
@@ -14,29 +15,46 @@
 	<h1> // Welcome home, </h1><h2><span id="id_username"></span></h2>
 
 
-	<table class="container">
+	<div id="id_alert" class="alertmessage"></div>
+
+	
+	<div><table class="container">
 		<tr>
 			<td class="form-column"> <h3> // My Groups </h3>
-				<table id="myTable">
-					<thead>
-						<tr> <th>Title</th> <th>Creation Date</th> <th>Participants</th> <th>Details</th> </tr>
+				
+				<table id="myTable"><thead>
+					<tr>
+						<th>Title</th> 
+						<th>Creation Date</th> 
+						<th>Participants</th> 
+						<th>Details</th> 
+					</tr>
 					</thead>
-					<tbody id="myTableBody"> </tbody>
+					<tbody id="myTableBody"> 
+					
+					</tbody>
 				
 				</table>
 			</td>
 			<td class="form-column"> <h3> // My Invitations </h3>
-				<table>
-					<thead id="othersTable">
-						<tr> <th>Title</th> <th>Creation Date</th> <th>Creator</th> <th>Details</th> </tr>
+				
+				<table id="othersTable"><thead>
+					<tr> 
+						<th>Title</th> 
+						<th>Creation Date</th> 
+						<th>Creator</th> 
+						<th>Details</th> 
+					</tr>
 					</thead>
-					<tbody id="othersTableBody"> </tbody>
+					<tbody id="othersTableBody"> 
+					
+					</tbody>
 				</table>
 			</td>
 		</tr>		
-	</table>
+	</table></div>
 	
-
+	
 
 
 	<div class="form-column">
@@ -81,7 +99,7 @@
 		</form></div>
 
 
-    <!-- The Modal -->
+    <!-- 					The Modal						-->
     <div id="myModal" class="modal">
         <div class="modal-content">
 

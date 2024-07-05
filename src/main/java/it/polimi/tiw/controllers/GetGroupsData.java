@@ -21,19 +21,22 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.GroupDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 
-@WebServlet("/Home")
-public class HomeController extends HttpServlet {
+@WebServlet("/GetGroupsData")
+public class GetGroupsData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 
 
-    public HomeController() {
+    public GetGroupsData() {
         super();
     }
 
@@ -59,7 +62,8 @@ public class HomeController extends HttpServlet {
     	String loginpath = getServletContext().getContextPath() + "/LandingPage.html";
     	HttpSession session = request.getSession();
     	if (session.isNew() || session.getAttribute("user") == null) {
-    		response.sendRedirect(loginpath);
+    		response.setStatus(403);
+    		response.setHeader("Location", loginpath);
     		return;
     	}
     	User user = (User) session.getAttribute("user");
@@ -76,7 +80,8 @@ public class HomeController extends HttpServlet {
 			myGroups = groupDAO.findMyGroups(user.getUsername());
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover myGroups");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to recover myGroups");
 			return;
 		}
 
@@ -86,12 +91,13 @@ public class HomeController extends HttpServlet {
 			othersGroups = groupDAO.findOthersGroup(user.getUsername());
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover othersGroups");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to recover othersGroups");
 			return;
 		}
 
 
-//    	 Filtering for active groups only
+    	//    	 Filtering for active groups only
     	Iterator<Group> myGroupsIterator = myGroups.iterator();
     	while (myGroupsIterator.hasNext()) {
     	    Group group = myGroupsIterator.next();
@@ -110,8 +116,20 @@ public class HomeController extends HttpServlet {
     	    }
     	}
 
-
-
+    	
+    	// Create a container for both lists
+        ListsContainer listsContainer = new ListsContainer(myGroups, othersGroups);
+    	
+    	// Convert into JSON Data and send!
+    	Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+		String json = gson.toJson(listsContainer);
+    	
+		System.out.println("The listContainer is: "+ listsContainer);
+		
+    	response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
+    	return;
     }
 
 
@@ -128,5 +146,16 @@ public class HomeController extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+	
+	
+    class ListsContainer {
+        private List<Group> groupList1;
+        private List<Group> groupList2;
+
+        public ListsContainer(List<Group> groupList1, List<Group> groupList2) {
+            this.groupList1 = groupList1;
+            this.groupList2 = groupList2;
+        }
+    }
 
 }
