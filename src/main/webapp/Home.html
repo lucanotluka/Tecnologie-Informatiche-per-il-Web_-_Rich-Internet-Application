@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Home</title>
 	<script src="utils.js" charset="utf-8" defer></script>
+	<script src="homeManager.js" charset="utf-8" defer></script>
 	<link rel="stylesheet" type="text/css" media="all" href="CSS/mystyle.css"/>
 </head>
 <body>
@@ -36,6 +37,9 @@
 		</tr>		
 	</table>
 	
+
+
+
 	<div class="form-column">
 		<h3> // Group Details </h3>
 		<table id="groupDetails">
@@ -50,12 +54,12 @@
 	</div>
 	
 
-	<div id="anagraficWindow"></div>
-	
+
+
+	<!-- 				GROUP CREATION 				 -->
 
 	<h3> // Create a new group! </h3>
-	<div>
-		<form action="#" method="POST" id="newGroupForm">
+	<div><form action="#" id="newGroupForm">
 			<fieldset>
 				<p>
 					Group Title: <input type="text" name="title" required />
@@ -75,7 +79,35 @@
 				<p id="formErrMsg"></p> 
 				<input id="newGroupButton" type="submit" name="Send">
 			</fieldset>
-		</form>
-	</div>
+		</form></div>
+
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+
+            <h3>Anagrafica</h3>
+
+            <table id="anagraficaTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Email</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tbody id="anagraficaTableBody">
+                    <!-- To be populated via AJAX -->
+                </tbody>
+            </table>
+
+            <div class="button-group">
+                <button class="cancella">Cancella</button>
+                <button class="invia">Invia</button>
+            </div>
+
+        </div>
+    </div>
 </body>
 </html>

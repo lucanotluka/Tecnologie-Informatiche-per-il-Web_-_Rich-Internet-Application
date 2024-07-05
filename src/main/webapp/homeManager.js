@@ -3,7 +3,7 @@
  */
 {
 		// dichiarazione componenti della pagina HOME.html
-	 let missionDetails, missionsList, wizard,
+	 let groupDetails, groupsLists, wizard,
 	    pageOrchestrator = new PageOrchestrator(); // main controller
 
 
@@ -14,13 +14,9 @@
 	      window.location.href = "LandingPage.html";
 	    } else {
 	      pageOrchestrator.start(); // initialize the components
-	      pageOrchestrator.refresh();
+	      pageOrchestrator.	refresh();
 	    } // display initial content
 	  }, false);
-
-
-
-
 
 
 
@@ -81,9 +77,6 @@
 	      wizard.reset();
 	    };
 	  }
-	  
-	  
-	  
 	  
 	  
 	  
