@@ -12,7 +12,7 @@
 	      window.location.href = "LandingPage.html";
 	    } else {
 	      pageOrchestrator.start(); // initialize the components
-	      pageOrchestrator.	refresh();
+	      pageOrchestrator.refresh();
 	    } // display initial content
 	  }, false);
 
@@ -33,7 +33,8 @@
 	      })
 			
 			// Construct and show() the Welcome message
-	      personalMessage = new PersonalMessage(sessionStorage.getItem('username'), document.getElementById("id_username"));
+	      personalMessage = new PersonalMessage(sessionStorage.getItem('username'), 
+	      									document.getElementById("id_username"));
 	      personalMessage.show();
 
 
@@ -65,9 +66,9 @@
 	      groupsLists.reset();
 	      groupsLists.show();
 	      
-	      // wizard.reset();
-	      
 	      // groupDetails.reset();
+	      
+	      // wizard.reset();
 	      	      
 	    };
 	  }
@@ -134,9 +135,7 @@
 	              console.log("Group List 1:", myGroups);
                   console.log("Group List 2:", othersGroups);
 	              
-	              if (myGroups.length == 0 && othersGroups.length == 0)
-	                return;
-	              
+	        	              
 	              // Now update the actual containers!
 	              self.update(myGroups, othersGroups);
 	            
@@ -165,6 +164,24 @@
 	      // build updated list
 	      var self = this;
 	      
+	      if(myGroups.length == 0){
+			row = document.createElement("tr");
+	        cell = document.createElement("td");
+	        cell.textContent = "You havent any active group.";
+	        row.appendChild(cell);
+	        self.myTableBody.appendChild(row);
+		  }
+		  
+		  
+		  if(othersGroups.length == 0){
+			row = document.createElement("tr");
+	        cell = document.createElement("td");
+	        cell.textContent = "You havent been invited yet.";
+	        row.appendChild(cell);
+	        self.othersTableBody.appendChild(row);
+		  }
+		  
+	      
 	      myGroups.forEach(function(group) {
 	        
 	        // Create a new row for the entry
@@ -182,7 +199,8 @@
 	        
 	        // Cell for the No. Participants
 	        partscell = document.createElement("td");
-	        partscell.textContent = group.participants.length;
+	        var i = group.participants.length + 1;
+	        partscell.textContent = i;
 	        row.appendChild(partscell);
 	        
 	        //  Cell for the link
@@ -261,7 +279,7 @@
 	  
 	  		// --------3.  --------- ---- The Group Details ---- ------------------- TODO
 	  		
-	  function MissionDetails(options) {
+	  function GroupDetails(options) {
 	    this.alert = options['alert'];
 	    this.detailcontainer = options['detailcontainer'];
 	    this.expensecontainer = options['expensecontainer'];
