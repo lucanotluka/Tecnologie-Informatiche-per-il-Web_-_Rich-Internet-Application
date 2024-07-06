@@ -95,8 +95,10 @@ public class GetGroupsData extends HttpServlet {
 			response.getWriter().println("Not possible to recover othersGroups");
 			return;
 		}
-
-
+    	
+    	System.out.println(myGroups + " ");    
+    	System.out.println(othersGroups + " "); 
+    	
     	//    	 Filtering for active groups only
     	Iterator<Group> myGroupsIterator = myGroups.iterator();
     	while (myGroupsIterator.hasNext()) {
@@ -104,6 +106,7 @@ public class GetGroupsData extends HttpServlet {
     	    if (getGroupEndDate(group.getCreationDate(), group.getHowManyDays())
     	            .compareTo(getMeYesterday()) <= 0) {
     	        myGroupsIterator.remove();
+    	        System.out.println("Removed " + group.getTitle());   
     	    }
     	}
     	
@@ -113,6 +116,7 @@ public class GetGroupsData extends HttpServlet {
     	    if (getGroupEndDate(group.getCreationDate(), group.getHowManyDays())
     	            .compareTo(getMeYesterday()) <= 0) {
     	        othersGroupsIterator.remove();
+    	        System.out.println("Removed " + group.getTitle());  
     	    }
     	}
 

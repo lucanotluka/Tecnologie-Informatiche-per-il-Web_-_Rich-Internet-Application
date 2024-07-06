@@ -52,7 +52,8 @@
 	      groupDetails = new GroupDetails(document.getElementById("id_alert"),
 			  					  document.getElementById("groupDetails"), 
 								  document.getElementById("groupDetailsBody"),
-								  document.getElementById("invitedUsersBody")
+								  document.getElementById("invitedUsersBody"),
+								  document.getElementById("bin")
 								);
 	      
 	      
@@ -221,7 +222,7 @@
 	        // Make list item clickable
 	        anchor.setAttribute('groupID', group.ID); // set a custom HTML attribute
 	        anchor.addEventListener("click", (e) => {
-	          // dependency via module parameter										TODO
+	          // dependency via module parameter										
 	          groupDetails.show(e.target.getAttribute("groupID")); 
 	        }, false);
 	        
@@ -285,11 +286,16 @@
 	  
 	  		// --------3.  --------- ---- The Group Details ---- ------------------- TODO
 	  		
-	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody) {
+	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody, _bin) {
 	    this.alert = _alert;
 	    this.groupDetails = _groupDetails;
 	    this.groupDetailsBody = _groupDetailsBody;
 	    this.invitedUsersBody = _invitedUsersBody;
+	    this.bin = _bin;
+	    this.minParts = null;
+	    this.parts = null;
+	    this.groupID = null;
+	    
 
 		
 		this.reset = function() {
@@ -299,7 +305,6 @@
 
 	    this.show = function(groupID) {
 	      var self = this;
-	      
 	      makeCall("GET", "GetGroupDetailsData?groupid=" + groupID, null,
 	        function(req) {
 	          if (req.readyState == 4) {
@@ -312,6 +317,10 @@
 	              console.log("ResponseText: ", req.responseText);
 	              console.log("Group: ", details.group);
 	              console.log("Participants: ", details.users);
+	              
+	              self.groupID = details.group.groupID;
+	              self.minParts = details.group.minParts;
+	              self.parts = (details.users.length + 1);	// counting invited users and creator
 	              
 	              self.update(details.group, details.users); 
 	             	             
@@ -326,25 +335,18 @@
 	          }
 	        }
 	      );
-	    };
+	    }
 
 	    
-			
 	    this.update = function(group, users) {
-			
-			/*  private int details.group.ID;
-				private String details.group.title;
-				private Date details.group.creationDate;
-				private int details.group.howManyDays;
-				private int details.group.minParts;
-				private int details.group.maxParts;
-				private String details.group.creator;
-				private List<User> details.users;
-				Invited Users: users[0] is creator
-				
-				*/
-				
-		  var row, titlecell, creatorcell, datecell, duracell, mincell, maxcell, usercell;
+					
+		  var row, titlecell, creatorcell, datecell, duracell, mincell, maxcell, usercell, draggable;
+		  
+		  if(sessionStorage.getItem("username") == group.creator){
+			  draggable = true;
+		  } else {
+			  draggable = false;
+		  }
 	      
 	      // empty the tables bodies
 	      this.groupDetailsBody.innerHTML = "";
@@ -429,20 +431,127 @@
 			users.forEach(function(user) {
 				row = document.createElement("tr");
 		        usercell = document.createElement("td");
-		        usercell.textContent = " - " + user.surname + " " + user.name;
+		        usercell.textContent = user.surname + " " + user.name;
+		        usercell.className = 'list-item';
+		        
+		        if(draggable == true){	// Then I make the things draggable
+	                usercell.draggable = true;
+	                usercell.id = user.username;        
+	                
+	                // Store the ID of the item being dragged
+	                usercell.addEventListener('dragstart', handleDragStart);
+	                
+	                // Remove the dragging class once dragging ends
+                	usercell.addEventListener('dragend', handleDragEnd);
+				}
+				else {
+					usercell.classList.add('non-draggable');
+				}
+		        
 		        row.appendChild(usercell);
 		        self.invitedUsersBody.appendChild(row);
 	        });
+	        
+	        
+	        // Then I gotta initialize the eventListeners and set the Bin to visible.
+	        if(draggable == true){
+	        	self.bin.style.display = 'block';
+	        	
+	        	// Allow the trash bin to accept the drop
+	        	self.bin.addEventListener('dragover', handleDragOver);
+	        	
+	        	// Highlight the trash bin when an item is dragged over it
+	            //self.bin.addEventListener('dragenter', handleDragEnter);
+	            
+	            // Remove the highlight when the item leaves the trash bin area
+	            //self.bin.addEventListener('dragleave', handleDragLeave);
+	            
+	            // Handle the drop event
+	            self.bin.addEventListener('drop', function(e) { handleDrop(e, self); });
+	        }
+	        else{
+				self.bin.style.display = 'none';				
+			}
 	        
 			      
 	      
 	      	// 	--------------------- END INVITED USERS  --------------------------
 	      
-	      this.groupDetails.style.visibility = "visible";
+	      self.groupDetails.style.visibility = "visible";
 	    }
 	    
-	  }
+	   
+	    // Sets the data transfer and adds a dragging class.
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text', e.target.id);
+            
+            console.log('Dragging ' + e.target.id);
+            
+            setTimeout(() => {
+                e.target.classList.add('dragging');
+            }, 0);
+        }
+
+        // Removes the dragging class.
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+		// Prevents the default action to allow drop.
+        function handleDragOver(e) {
+            e.preventDefault();
+            console.log('Dragging over ');           
+        }
+
+		// Adds a visual cue when the item enters the trash bin.
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.classList.add('over');
+        }
+
+		// Removes the visual cue when the item leaves the trash bin.
+        function handleDragLeave(e) {
+            e.target.classList.remove('over');
+        }
+        
+       
+
+		// Handles the drop by removing the item from the list and displaying a message.
+        function handleDrop (e, instance) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            
+            try {
+	            // Get the username and its element
+	            var username = e.dataTransfer.getData('text');
+	            console.log('Dropping ' + username);            
+	            
+	            var draggableElement = document.getElementById(username);
+	            
+	            // TO FIX THIS
+	            var self = instance;										
+				
+				// Cannot perform action!
+				if(self.parts - 1 < self.minParts){
+					instance.alert.textContent = 'Cannot remove ' + username + '! Minimum number of participants reached.';
+				} else {
+					instance.alert.textContent = 'AJAX CALL';
+					
+		            e.target.classList.remove('over');
+		            draggableElement.parentNode.removeChild(draggableElement);
+					
+				}
+			} catch (err) {
+            	console.error('Drop handling failed:', err);
+        	}
+        };
+    
+    }
 	  
+        
+
+
 	  
 	  	// ------------4. ------------- The Wizzzzard ------------------------------ TODO
 	  

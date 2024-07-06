@@ -8,17 +8,40 @@ header {
 }
 
 
-
 #groupDetails {
-     display: flex;
+    display: flex;
     align-items: left;
     padding: 20px;
  }
 
+.bin{
+     display: none;
+     border: 1px solid black;
+     padding: 15px;
+     width: 45px; 
+     height: 45px;
+}
+
+.bin.over {
+   background-color: rgb(237, 51, 59);
+}
+
+.list-item {
+   border: 1px solid;
+   background-color: #f9f9f9;
+   cursor: move;
+}
+
+.list-item.non-draggable {
+	cursor: not-allowed;
+}
 
 
 .alertmessage{
 	color: red;
+	display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container {
