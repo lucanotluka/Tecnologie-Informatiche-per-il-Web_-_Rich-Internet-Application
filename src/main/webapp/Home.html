@@ -23,7 +23,7 @@
 			<td class="form-column"> <h3> // My Groups </h3>
 				
 				<table id="myTable"><thead>
-					<tr>
+					<tr id="myTableHead">
 						<th>Title</th> 
 						<th>Creation Date</th> 
 						<th>Participants</th> 
@@ -39,7 +39,7 @@
 			<td class="form-column"> <h3> // My Invitations </h3>
 				
 				<table id="othersTable"><thead>
-					<tr> 
+					<tr id="othersTableHead"> 
 						<th>Title</th> 
 						<th>Creation Date</th> 
 						<th>Creator</th> 
@@ -57,17 +57,32 @@
 	
 
 
-	<div class="form-column">
-		<h3> // Group Details </h3>
-		<table id="groupDetails">
+	<div id="groupDetails">
+		<table>
 			<thead>
-				<tr> <th>Title</th> <th>Creator</th> <th>Creation Date</th> 
-				<th>Duration</th> <th>Max participants</th> <th>Min participants</th> </tr>
+			<tr> 
+				<th>Group Details</th> 
+			</tr>
 			</thead>
 			
-			<tbody id="groupDetailsBody"> 	</tbody>
-		
+			<tbody id="groupDetailsBody"> 
+				<!-- POPULATE WITH AJAX -->
+			</tbody>
+	
 		</table>
+		
+		<table>
+			<thead>
+			<tr> 
+				<th>Invited Users</th> 
+			</tr>
+			</thead>
+			
+			<tbody id="invitedUsersBody"> 
+				<!-- POPULATE WITH AJAX -->
+			</tbody>
+		</table>
+		
 	</div>
 	
 

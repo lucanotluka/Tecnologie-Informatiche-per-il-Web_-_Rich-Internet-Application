@@ -48,14 +48,19 @@
 							  	);
 
 
-			// Construct the Detail component								TODO
-	      //groupDetails = new GroupDetails();
+			// Construct the Details component								
+	      groupDetails = new GroupDetails(document.getElementById("id_alert"),
+			  					  document.getElementById("groupDetails"), 
+								  document.getElementById("groupDetailsBody"),
+								  document.getElementById("invitedUsersBody")
+								);
 	      //groupDetails.registerEvents(this); 
 	      
 	      
 	      	// Construct the Wizard component								TODO
 	      //wizard = new Wizard(document.getElementById("id_createmissionform"), alertContainer);
 	      //wizard.registerEvents(this);  
+								  
 	    
 	    };
 
@@ -66,7 +71,7 @@
 	      groupsLists.reset();
 	      groupsLists.show();
 	      
-	      // groupDetails.reset();
+	      groupDetails.reset();
 	      
 	      // wizard.reset();
 	      	      
@@ -170,6 +175,7 @@
 	        cell.textContent = "You havent any active group.";
 	        row.appendChild(cell);
 	        self.myTableBody.appendChild(row);
+	        
 		  }
 		  
 		  
@@ -179,6 +185,7 @@
 	        cell.textContent = "You havent been invited yet.";
 	        row.appendChild(cell);
 	        self.othersTableBody.appendChild(row);
+	       
 		  }
 		  
 	      
@@ -279,25 +286,21 @@
 	  
 	  		// --------3.  --------- ---- The Group Details ---- ------------------- TODO
 	  		
-	  function GroupDetails(options) {
-	    this.alert = options['alert'];
-	    this.detailcontainer = options['detailcontainer'];
-	    this.expensecontainer = options['expensecontainer'];
-	    this.expenseform = options['expenseform'];
-	    this.closeform = options['closeform'];
-	    this.date = options['date'];
-	    this.destination = options['destination'];
-	    this.status = options['status'];
-	    this.description = options['description'];
-	    this.country = options['country'];
-	    this.province = options['province'];
-	    this.city = options['city'];
-	    this.fund = options['fund'];
-	    this.food = options['food'];
-	    this.accomodation = options['accomodation'];
-	    this.travel = options['transportation'];
+	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody) {
+	    this.alert = _alert;
+	    this.groupDetails = _groupDetails;
+	    this.groupDetailsBody = _groupDetailsBody;
+	    this.invitedUsersBody = _invitedUsersBody;
 
-	    this.registerEvents = function(orchestrator) {
+		
+		this.reset = function() {
+	      this.groupDetails.style.visibility = "hidden";
+	    }
+
+
+				// THIS may be needed to be DONE 4 DragNDrop.		TODO
+	
+	    /*this.registerEvents = function(orchestrator) {
 	      this.expenseform.querySelector("input[type='button']").addEventListener('click', (e) => {
 	        var form = e.target.closest("form");
 	        if (form.checkValidity()) {
@@ -345,38 +348,27 @@
 	          }
 	        );
 	      });
-	    }
+	    }*/
 
-	    this.show = function(missionid) {
+
+	    this.show = function(groupID) {
 	      var self = this;
-	      makeCall("GET", "GetMissionDetailsData?missionid=" + missionid, null,
+	      
+	      makeCall("GET", "GetGroupDetailsData?groupid=" + groupID, null,
 	        function(req) {
 	          if (req.readyState == 4) {
 	            var message = req.responseText;
+	            
 	            if (req.status == 200) {
-	              var mission = JSON.parse(req.responseText);
-	              self.update(mission); // self is the object on which the function
-	              // is applied
-	              self.detailcontainer.style.visibility = "visible";
-	              switch (mission.status) {
-	                case "OPEN":
-	                  self.expensecontainer.style.visibility = "hidden";
-	                  self.expenseform.style.visibility = "visible";
-	                  self.expenseform.missionid.value = mission.id;
-	                  self.closeform.style.visibility = "hidden";
-	                  break;
-	                case "REPORTED":
-	                  self.expensecontainer.style.visibility = "visible";
-	                  self.expenseform.style.visibility = "hidden";
-	                  self.closeform.missionid.value = mission.id;
-	                  self.closeform.style.visibility = "visible";
-	                  break;
-	                case "CLOSED":
-	                  self.expensecontainer.style.visibility = "visible";
-	                  self.expenseform.style.visibility = "hidden";
-	                  self.closeform.style.visibility = "hidden";
-	                  break;
-	              }
+	              
+	              var details = JSON.parse(req.responseText);
+	              
+	              console.log("ResponseText: ", req.responseText);
+	              console.log("Group: ", details.group);
+	              console.log("Participants: ", details.users);
+	              
+	              self.update(details.group, details.users); 
+	             	             
 	            } else if (req.status == 403) {
                   window.location.href = req.getResponseHeader("Location");
                   window.sessionStorage.removeItem('username');
@@ -390,26 +382,110 @@
 	      );
 	    };
 
-	    this.reset = function() {
-	      this.detailcontainer.style.visibility = "hidden";
-	      this.expensecontainer.style.visibility = "hidden";
-	      this.expenseform.style.visibility = "hidden";
-	      this.closeform.style.visibility = "hidden";
-	    }
+	    
+			
+	    this.update = function(group, users) {
+			
+			/*  private int details.group.ID;
+				private String details.group.title;
+				private Date details.group.creationDate;
+				private int details.group.howManyDays;
+				private int details.group.minParts;
+				private int details.group.maxParts;
+				private String details.group.creator;
+				private List<User> details.users;
+				Invited Users: users[0] is creator
+				
+				*/
+				
+		  var row, titlecell, creatorcell, datecell, duracell, mincell, maxcell, usercell;
+	      
+	      // empty the tables bodies
+	      this.groupDetailsBody.innerHTML = "";
+	      this.invitedUsersBody.innerHTML = "";
 
-	    this.update = function(m) {
-	      this.date.textContent = m.startDate;
-	      this.destination.textContent = m.destination;
-	      this.status.textContent = m.status;
-	      this.description.textContent = m.description;
-	      this.country.textContent = m.country;
-	      this.province.textContent = m.province;
-	      this.city.textContent = m.city;
-	      this.fund.textContent = m.fund;
-	      this.food.textContent = m.expenses.food;
-	      this.accomodation.textContent = m.expenses.accomodation;
-	      this.travel.textContent = m.expenses.transportation;
+	      // build updated list
+	      var self = this;
+	      
+	      // 	---------------------  DETAILS TABLE  --------------------------
+	      
+	      // Create a new row for TITLE
+	        row = document.createElement("tr");
+	        titlecell = document.createElement("td");
+	        titlecell.textContent = "Title";
+	        row.appendChild(titlecell);
+	        titlecell = document.createElement("td");
+	        titlecell.textContent = group.title;
+	        row.appendChild(titlecell);
+	        self.groupDetailsBody.appendChild(row);
+	        
+	       // Create a new row for CREATOR
+	        row = document.createElement("tr");
+	        creatorcell = document.createElement("td");
+	        creatorcell.textContent = "Creator";
+	        row.appendChild(creatorcell);
+	        creatorcell = document.createElement("td");
+	        creatorcell.textContent = group.creator;
+	        row.appendChild(creatorcell);
+	        self.groupDetailsBody.appendChild(row);
+	       
+	       // Create a new row for DATE
+	        row = document.createElement("tr");
+	        datecell = document.createElement("td");
+	        datecell.textContent = "Start Date";
+	        row.appendChild(datecell);
+	        datecell = document.createElement("td");
+	        datecell.textContent = group.creationDate;
+	        row.appendChild(datecell);
+	        self.groupDetailsBody.appendChild(row);
+	        
+	        
+	        // Create a new row for DURATION
+	        row = document.createElement("tr");
+	        duracell = document.createElement("td");
+	        duracell.textContent = "Duration";
+	        row.appendChild(duracell);
+	        duracell = document.createElement("td");
+	        duracell.textContent = group.howManyDays;
+	        row.appendChild(duracell);
+	        self.groupDetailsBody.appendChild(row);
+	        
+	        // Create a new row for MIN
+	        row = document.createElement("tr");
+	        mincell = document.createElement("td");
+	        mincell.textContent = "Minimum";
+	        row.appendChild(mincell);
+	        mincell = document.createElement("td");
+	        mincell.textContent = group.minParts;
+	        row.appendChild(mincell);
+	        self.groupDetailsBody.appendChild(row);
+	        
+	        // Create a new row for MAX
+	        row = document.createElement("tr");
+	        maxcell = document.createElement("td");
+	        maxcell.textContent = "Maximum";
+	        row.appendChild(maxcell);
+	        maxcell = document.createElement("td");
+	        maxcell.textContent = group.maxParts;
+	        row.appendChild(maxcell);
+	        self.groupDetailsBody.appendChild(row);
+	        
+	        // 	---------------------  END DETAILS TABLE  -------------------------- 
+	       
+	       
+	        // 	---------------------  INVITED USERS  --------------------------
+				
+	   
+			      // Here, gotta be handled the DragNDrop shaite.
+			      // IF CREATOR, THEN:
+			      // else do nothing
+			      
+	      
+	      	// 	--------------------- END INVITED USERS  --------------------------
+	      
+	      this.groupDetails.style.visibility = "visible";
 	    }
+	    
 	  }
 	  
 	  

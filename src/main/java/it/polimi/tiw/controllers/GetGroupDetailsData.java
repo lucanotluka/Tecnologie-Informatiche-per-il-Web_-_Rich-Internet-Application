@@ -19,32 +19,30 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
+import it.polimi.tiw.controllers.GetGroupsData.ListsContainer;
 import it.polimi.tiw.dao.GroupDAO;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
-@WebServlet("/GetGroupDetails")
-public class GetGroupDetails extends HttpServlet {
+@WebServlet("/GetGroupDetailsData")
+public class GetGroupDetailsData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
 
 
-    public GetGroupDetails() {
+    public GetGroupDetailsData() {
         super();
     }
 
 	@Override
 	public void init() throws ServletException {
-		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
@@ -57,7 +55,8 @@ public class GetGroupDetails extends HttpServlet {
     	String loginpath = getServletContext().getContextPath() + "/LandingPage.html";
     	HttpSession session = request.getSession();
     	if (session.isNew() || session.getAttribute("user") == null) {
-    		response.sendRedirect(loginpath);
+    		response.setStatus(403);
+    		response.setHeader("Location", loginpath);
     		return;
     	}
     	User user = (User) session.getAttribute("user");
@@ -69,7 +68,8 @@ public class GetGroupDetails extends HttpServlet {
 		try {
 			groupID = Integer.parseInt(request.getParameter("groupid"));
 		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 
@@ -80,17 +80,19 @@ public class GetGroupDetails extends HttpServlet {
 
 		try {
 			myGroup = groupDAO.getGroupByID(groupID);
-			if(myGroup == null) throw new Exception("Group recovered but null");
+			
+			if(myGroup == null) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				response.getWriter().println("Resource not found");
+				return;
+			}
 		} catch (SQLException e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover Group");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to recover Group");
 			return;
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Group recovered but null");
-			return;
-		}
-
+		} 
+		
+		
 		if(myGroup.getParticipants().size() > 0) {
 			try {
 				UserDAO userDAO = new UserDAO(connection);
@@ -106,25 +108,38 @@ public class GetGroupDetails extends HttpServlet {
 
 
 			}catch (SQLException e) {
-				e.printStackTrace();
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover invited Users");
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().println("Not possible to recover Group");
 				return;
 			}
 		}
 
 
+    	// Create a container for both lists
+        Container container = new Container(myGroup, invitedUsers);
+    	
+    	// Convert into JSON Data and send!
+    	Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+		String json = gson.toJson(container);
+    	
 
-    	// Redirect to the Group Detail page
-    	// and add Group to the parameters!!
-
-		String path = "/WEB-INF/DettagliGruppo.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("group", myGroup);
-		ctx.setVariable("users", invitedUsers);
-		templateEngine.process(path, ctx, response.getWriter());
-
+    	response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
+    	return;
+		
 	}
+	
+	
+    class Container {
+        private Group group;
+        private List<User> users;
+
+        public Container(Group group, List<User> users) {
+            this.group = group;
+            this.users = users;
+        }
+    }
 
 
 	@Override
