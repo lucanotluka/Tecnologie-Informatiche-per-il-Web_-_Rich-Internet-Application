@@ -54,7 +54,6 @@
 								  document.getElementById("groupDetailsBody"),
 								  document.getElementById("invitedUsersBody")
 								);
-	      //groupDetails.registerEvents(this); 
 	      
 	      
 	      	// Construct the Wizard component								TODO
@@ -298,59 +297,6 @@
 	    }
 
 
-				// THIS may be needed to be DONE 4 DragNDrop.		TODO
-	
-	    /*this.registerEvents = function(orchestrator) {
-	      this.expenseform.querySelector("input[type='button']").addEventListener('click', (e) => {
-	        var form = e.target.closest("form");
-	        if (form.checkValidity()) {
-	          var self = this,
-	            missionToReport = form.querySelector("input[type = 'hidden']").value;
-	          makeCall("POST", 'CreateExpensesReport', form,
-	            function(req) {
-	              if (req.readyState == 4) {
-	                var message = req.responseText;
-	                if (req.status == 200) {
-	                  orchestrator.refresh(missionToReport);
-	                } else if (req.status == 403) {
-                  window.location.href = req.getResponseHeader("Location");
-                  window.sessionStorage.removeItem('username');
-                  }
-                  else {
-	                  self.alert.textContent = message;
-	                }
-	              }
-	            }
-	          );
-	        } else {
-	          form.reportValidity();
-	        }
-	      });
-
-	      this.closeform.querySelector("input[type='button']").addEventListener('click', (event) => {
-	        var self = this,
-	          form = event.target.closest("form"),
-	          missionToClose = form.querySelector("input[type = 'hidden']").value;
-	        makeCall("POST", 'CloseMission', form,
-	          function(req) {
-	            if (req.readyState == 4) {
-	              var message = req.responseText;
-	              if (req.status == 200) {
-	                orchestrator.refresh(missionToClose);
-	              } else if (req.status == 403) {
-                  	window.location.href = req.getResponseHeader("Location");
-                  	window.sessionStorage.removeItem('username');
-                  }
-                  else {
-	                self.alert.textContent = message;
-	              }
-	            }
-	          }
-	        );
-	      });
-	    }*/
-
-
 	    this.show = function(groupID) {
 	      var self = this;
 	      
@@ -479,6 +425,15 @@
 			      // Here, gotta be handled the DragNDrop shaite.
 			      // IF CREATOR, THEN:
 			      // else do nothing
+			      
+			users.forEach(function(user) {
+				row = document.createElement("tr");
+		        usercell = document.createElement("td");
+		        usercell.textContent = " - " + user.surname + " " + user.name;
+		        row.appendChild(usercell);
+		        self.invitedUsersBody.appendChild(row);
+	        });
+	        
 			      
 	      
 	      	// 	--------------------- END INVITED USERS  --------------------------

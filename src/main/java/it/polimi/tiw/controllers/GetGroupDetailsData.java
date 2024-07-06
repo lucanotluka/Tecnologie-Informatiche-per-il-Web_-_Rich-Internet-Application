@@ -103,9 +103,6 @@ public class GetGroupDetailsData extends HttpServlet {
 					invitedUsers.add(user1);
 				}
 
-				// Adding creator to the list for better displaying
-				invitedUsers.add(0, userDAO.getUserByUsername(myGroup.getCreator()));
-
 
 			}catch (SQLException e) {
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

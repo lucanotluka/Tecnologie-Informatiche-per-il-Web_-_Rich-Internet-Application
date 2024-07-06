@@ -1,7 +1,5 @@
 table, th, tr, .container {
   border: 1px solid black;
-  width: 48%;
-  border-collapse: collapse;
   margin-bottom: 20px;
   padding: 8px;
 }
@@ -13,7 +11,8 @@ header {
 
 #groupDetails {
      display: flex;
-     justify-content: space-between;
+    align-items: left;
+    padding: 20px;
  }
 
 
