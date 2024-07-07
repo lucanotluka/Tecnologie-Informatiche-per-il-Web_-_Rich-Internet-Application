@@ -239,5 +239,23 @@ public class GroupDAO {
 		return group;
 	}
 
+
+
+	public boolean removeInvitedUser(Integer groupID, String username) throws SQLException {
+		boolean success = false;
+		
+		String query = "DELETE FROM user2group WHERE IDgroup = ? AND username = ?";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) 
+		{
+			pstatement.setInt(1, groupID);
+			pstatement.setString(2, username);
+			
+			int affectedRows = pstatement.executeUpdate();
+			
+			if(affectedRows > 0) success = true;
+		}
+		return success;
+	}
+
 }
 

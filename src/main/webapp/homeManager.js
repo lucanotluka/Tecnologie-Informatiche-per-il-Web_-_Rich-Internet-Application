@@ -305,6 +305,7 @@
 
 	    this.show = function(groupID) {
 	      var self = this;
+	      self.groupID = groupID;
 	      makeCall("GET", "GetGroupDetailsData?groupid=" + groupID, null,
 	        function(req) {
 	          if (req.readyState == 4) {
@@ -318,7 +319,7 @@
 	              console.log("Group: ", details.group);
 	              console.log("Participants: ", details.users);
 	              
-	              self.groupID = details.group.groupID;
+	              
 	              self.minParts = details.group.minParts;
 	              self.parts = (details.users.length + 1);	// counting invited users and creator
 	              
@@ -347,6 +348,8 @@
 		  } else {
 			  draggable = false;
 		  }
+		  
+		  this.alert.textContent = "";
 	      
 	      // empty the tables bodies
 	      this.groupDetailsBody.innerHTML = "";
@@ -461,10 +464,10 @@
 	        	self.bin.addEventListener('dragover', handleDragOver);
 	        	
 	        	// Highlight the trash bin when an item is dragged over it
-	            //self.bin.addEventListener('dragenter', handleDragEnter);
+	            self.bin.addEventListener('dragenter', handleDragEnter);
 	            
 	            // Remove the highlight when the item leaves the trash bin area
-	            //self.bin.addEventListener('dragleave', handleDragLeave);
+	            self.bin.addEventListener('dragleave', handleDragLeave);
 	            
 	            // Handle the drop event
 	            self.bin.addEventListener('drop', function(e) { handleDrop(e, self); });
@@ -525,18 +528,43 @@
             try {
 	            // Get the username and its element
 	            var username = e.dataTransfer.getData('text');
-	            console.log('Dropping ' + username);            
+	            console.log('Dropping - in the bin - user ' + username);            
 	            
 	            var draggableElement = document.getElementById(username);
 	            
-	            // TO FIX THIS
-	            var self = instance;										
+	            								
 				
 				// Cannot perform action!
-				if(self.parts - 1 < self.minParts){
+				if(instance.parts - 1 < instance.minParts){
 					instance.alert.textContent = 'Cannot remove ' + username + '! Minimum number of participants reached.';
 				} else {
-					instance.alert.textContent = 'AJAX CALL';
+					
+					console.log("RemoveInvitedUser?groupid=" + instance.groupID + "&username=" + username);					
+					
+					// AJAX CALL to RemoveInvitedUser
+					makeCall("POST", "RemoveInvitedUser?groupid=" + instance.groupID + "&username=" + username, null, 
+							  function(req) {
+					            if (req.readyState == 4) {
+					              var message = req.responseText;
+					              
+					              if (req.status == 200) {
+									  
+									  // IF EVERYTHING GOOD
+					                
+					                // modify the clientside parameters: shoul be done with refresh()
+					                instance.show(instance.groupID);
+					                
+					                
+					              } else if (req.status == 403) {
+				                  	window.location.href = req.getResponseHeader("Location");
+				                  	window.sessionStorage.removeItem('username');
+				                  }
+				                  else {
+					                instance.alert.textContent = message;
+					              }
+					            }
+					          }
+				        );
 					
 		            e.target.classList.remove('over');
 		            draggableElement.parentNode.removeChild(draggableElement);

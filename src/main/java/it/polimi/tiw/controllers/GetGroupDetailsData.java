@@ -33,8 +33,6 @@ import it.polimi.tiw.utils.ConnectionHandler;
 public class GetGroupDetailsData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
-
 
 
     public GetGroupDetailsData() {
