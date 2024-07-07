@@ -7,10 +7,12 @@ header {
     padding: 20px;
 }
 
-body{
-	margin: 5%;
+body {
+    padding: 5%;
+    margin: 8%;
+    align-items: center;
+    border: 1px solid #ddd;
 }
-
 #groupDetails {
     display: flex;
     align-items: left;
