@@ -816,10 +816,11 @@
         		{
 					// TODO the actual controls and sending!!
 					
-					var checkedUsers = document.querySelectorAll("#anagraficaTableBody input[type='checkbox']:checked").length;
+					var checkedUsers = document.querySelectorAll("#anagraficaTableBody input[type='checkbox']:checked");
+					var howManyChecked = checkedUsers.length;
 			        this.modalAlert.textContent = "";
 			        
-			        console.log("Number of checked users: " + checkedUsers);
+			        console.log("Number of checked users: " + howManyChecked);
 			        console.log("Attempts of inserting group: " + this.counter);
 			        
 			        if(this.counter > 2){
@@ -828,24 +829,42 @@
 						this.reset();
 					}
 			        this.counter++;
-			        if (checkedUsers < this.minParts - 1) {
-			            this.modalAlert.textContent = this.counter+ ` time. ` + `Too few users, please add at least ${this.minParts - checkedUsers - 1}.`;
+			        if (howManyChecked < this.minParts - 1) {
+			            this.modalAlert.textContent = this.counter+ ` time. ` + `Too few users, please add at least ${this.minParts - howManyChecked - 1}.`;
 			            
-			        } else if (checkedUsers > this.maxParts - 1) {
-			            this.modalAlert.textContent = this.counter+ ` time. ` +  `Too much users, please remove at least ${checkedUsers - this.maxParts + 1}.`;
+			        } else if (howManyChecked > this.maxParts - 1) {
+			            this.modalAlert.textContent = this.counter+ ` time. ` +  `Too much users, please remove at least ${howManyChecked - this.maxParts + 1}.`;
 			        	
 			        } else {
 			          			            
-			            // Add AJAX call to send the data to the server if needed
+			          	// Collect the checked users
+			            var selectedUsernames = [];
+			            checkedUsers.forEach((checkbox) => {
+			                selectedUsernames.push(checkbox.value);
+			            });
+			            console.log("Selected users:", selectedUsernames);
 			            
-			         	makeCall("POST", 'CreateGroup', null,
+			            
+			            // Add AJAX call to send the data to the server
+			                       var requestData = {
+						                title: this.title,
+						                date: this.date,
+						                duration: this.duration,
+						                minParts: this.minParts,
+						                maxParts: this.maxParts,
+						                participants: selectedUsernames
+						            };
+			            
+			         	makeCall("POST", 'CreateGroup', JSON.stringify(requestData),
 					            function(req) {
 					              if (req.readyState == XMLHttpRequest.DONE) {
 					                var message = req.responseText; 
 					                if (req.status == 200) {
 										
-			
+										alert('Group correctly inserted!');
 										// Fill the modal window!
+										this.reset();							
+										
 
 					                } else if (req.status == 403) {
 					                  window.location.href = req.getResponseHeader("Location");

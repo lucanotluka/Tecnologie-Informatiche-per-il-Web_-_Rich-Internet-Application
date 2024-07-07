@@ -6,6 +6,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import it.polimi.tiw.beans.User;
+import it.polimi.tiw.dao.GroupDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 
@@ -48,21 +51,24 @@ public class CreateGroup extends HttpServlet {
     	String loginpath = getServletContext().getContextPath() + "/LandingPage.html";
     	HttpSession session = request.getSession();
     	if (session.isNew() || session.getAttribute("user") == null) {
-    		response.sendRedirect(loginpath);
+    		response.setStatus(403);
+    		response.setHeader("Location", loginpath);
     		return;
     	}
     	User user = (User) session.getAttribute("user");
     	// End of Session persistency check
 
 
+    	
     	// Get and parse all parameters from request
     	boolean isBadRequest = false;
-
 		String title = null;
 		Date startDate = null;
 		Integer duration = null;
 		Integer minParts = null;
 		Integer maxParts = null;
+		String creator = user.getUsername();
+    	List<String> alreadyInvitedUsers = null;
 
 
 		try {
@@ -73,7 +79,14 @@ public class CreateGroup extends HttpServlet {
 			startDate = new java.sql.Date(utilDate.getTime());
 			minParts = Integer.parseInt(request.getParameter("minParts"));
 			maxParts = Integer.parseInt(request.getParameter("maxParts"));
+			alreadyInvitedUsers = Arrays.asList(request.getParameterValues("selectedUsernames"));
 
+			System.out.println(title);
+			System.out.println(startDate);
+			System.out.println(duration);
+			System.out.println(creator);
+			System.out.println(alreadyInvitedUsers);
+			
 			isBadRequest = duration == null || minParts == null || maxParts == null
 					|| duration <= 0 || maxParts < minParts || minParts <= 0
 					|| title == null || title.isEmpty()
@@ -83,30 +96,30 @@ public class CreateGroup extends HttpServlet {
 			e.printStackTrace();
 		}
 		if (isBadRequest) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 
 
-		// set attributes as session. manage them further in Anagrafica
+		// ACTUALLY CONSTRUCT THE DAOs AND SAVE into DB!
+    	GroupDAO groupDAO = new GroupDAO(connection);
+    		   // (the groups info are above!)
 
-		session.setAttribute("title", title);
-		session.setAttribute("date", startDate);
-		session.setAttribute("duration", duration);
-		session.setAttribute("minParts", minParts);
-		session.setAttribute("maxParts", maxParts);
+    	try {
+			groupDAO.createGroup(title, startDate, duration, minParts, maxParts, creator, alreadyInvitedUsers);
 
-		// initialize counter
+    	} catch (SQLException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to register the Group");
+			return;
+		}
+    	
 
-		Integer one = 1;
-		session.setAttribute("counter", one);
-
-
-		// redirect
-
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Anagrafica";
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
+    	response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+    	return;
 
 	}
 
