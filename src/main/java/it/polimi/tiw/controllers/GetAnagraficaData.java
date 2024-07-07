@@ -63,40 +63,7 @@ public class GetAnagraficaData extends HttpServlet {
     	// End of Session persistency check
 
 
-
-//    	// --------------- Counter check ---------------
-//    	Integer counter = (Integer) session.getAttribute("counter");
-//    	if(counter > 3 ) {
-//
-//    		// destroy session.Params
-//    		removeSessionParams(session);
-//
-//    		// redirect to CANCELLAZIONE
-//
-//    		String path = "/WEB-INF/Cancellazione.html";
-//    		ServletContext servletContext = getServletContext();
-//    		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-//    		templateEngine.process(path, ctx, response.getWriter());
-//    		return;
-//    	}
-//    	// ------------- END of counter check -------------
-
-
-
-
-    	// Retrieving of group attributes from session COULD BE FROM THE REQUEST!!!
-//		String title = (String) session.getAttribute("title");
-//		Date startDate = (java.sql.Date) session.getAttribute("date");
-//		Integer duration = (Integer) session.getAttribute("duration");
-//		Integer minParts = (Integer) session.getAttribute("minParts");
-//		Integer maxParts = (Integer) session.getAttribute("maxParts");
-//		String creator = user.getUsername();
-//
-//		if (title == null || startDate == null || duration == null || minParts == null || maxParts == null || creator == null) {
-//			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or absent param values");
-//			return;
-//		}
-    	
+  	
     	
 		// get and check params
 		String creator = null;
@@ -121,34 +88,6 @@ public class GetAnagraficaData extends HttpServlet {
 			return;
 		}
 
-
-
-		// Handling of the AlreadyInvitedUsers
-		// of the 1st time too
-
-//    	List<String> alreadyInvitedUsers = null;
-//
-//    	// When Creator has selected some Users
-//		try {
-//
-//			if(counter > 1)
-//				// send the invitedUsers to Thymeleaf: if u.username is in invitedUsers, check V
-//				alreadyInvitedUsers = (List<String>) session.getAttribute("alreadyInvitedUsers");
-//
-//
-//			if(alreadyInvitedUsers == null) {
-//				alreadyInvitedUsers = new ArrayList<>();
-//				alreadyInvitedUsers.add("null");
-//			}
-//
-//			System.out.println("doGet: " + alreadyInvitedUsers);
-//
-//			ctx.setVariable("alreadyInvitedUsers", alreadyInvitedUsers);
-//			session.removeAttribute("alreadyInvitedUsers");
-//
-//		} catch (Exception e1) {
-//			// None selected
-//		}
 
 
     	// Convert into JSON Data and send!
@@ -261,42 +200,19 @@ public class GetAnagraficaData extends HttpServlet {
     		   // (the groups info are above!)
 
     	try {
-
-    		System.out.println("Trying to register group...");
-
 			groupDAO.createGroup(title, startDate, duration, minParts, maxParts, creator, alreadyInvitedUsers);
 
     	} catch (SQLException e) {
-
-			removeSessionParams(session);
-
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to register the Group");
 			return;
 		}
 
 
 
-		removeSessionParams(session);
-
-
     	// THEN, REDIRECT TO HOME
     	String path = getServletContext().getContextPath() + "/Home";
     	response.sendRedirect(path);
   	}
-
-
-	private void removeSessionParams(HttpSession session) {
-		// destroy session.Params
-		session.removeAttribute("title");
-		session.removeAttribute("date");
-		session.removeAttribute("duration");
-		session.removeAttribute("minParts");
-		session.removeAttribute("maxParts");
-		session.removeAttribute("counter");
-		session.removeAttribute("errorAnagr");
-		session.removeAttribute("alreadyInvitedUsers");
-	}
-
 
 
 	@Override

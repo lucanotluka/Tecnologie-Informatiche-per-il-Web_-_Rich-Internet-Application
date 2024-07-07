@@ -599,6 +599,7 @@
 		  this.duration = null;
 		  this.minParts = null;
 		  this.maxParts = null;
+		  this.counter = null;
 		  
 		  
 		  
@@ -652,6 +653,7 @@
 						errorMessage.style.display = 'none';
 		          var self = this;
 		          
+		          this.modalAlert.textContent = "";		          
 		          
 		          // Show the modal window!
 		          self.changeWizView(newGroupForm, myModal);		          
@@ -667,6 +669,8 @@
 							
 							var users = JSON.parse(req.responseText);
 				            console.log("anagraficaData: ", users);
+				            
+				            self.counter = 0;
 
 							// Fill the modal window!
 		          			self.populateModal(users);	
@@ -687,15 +691,10 @@
 	      
 	      
 	      
-/*	      // Manage cancel button
-	      this.wizard.querySelector("input[type='button'].cancel").addEventListener('click', (e) => {
-	        e.target.closest('form').reset();
-	        this.reset();
-	      });
-	    */
-
 	    this.reset = function() {
 	      this.newGroupForm.reset();
+	      this.modalAlert.textContent = "";
+	      this.counter = 0;
 	      this.changeWizView(myModal, newGroupForm);
 	    }
 
@@ -799,10 +798,7 @@
 	
 		        
 		        self.anagraficaTableBody.appendChild(row);
-	      });
-			          
-	          
-	  
+	      });	  
 		}
 	  
 	  
@@ -814,10 +810,58 @@
 					this.reset();
 				});
         
+        		
+        		// Perform the controls and eventually send the data
         document.getElementsByClassName("invia")[0].addEventListener('click', (e) => 
         		{
 					// TODO the actual controls and sending!!
-					alert('Send button clicked!');
+					
+					var checkedUsers = document.querySelectorAll("#anagraficaTableBody input[type='checkbox']:checked").length;
+			        this.modalAlert.textContent = "";
+			        
+			        console.log("Number of checked users: " + checkedUsers);
+			        console.log("Attempts of inserting group: " + this.counter);
+			        
+			        if(this.counter > 2){
+						alert(`You tried too many times...`);
+						
+						this.reset();
+					}
+			        this.counter++;
+			        if (checkedUsers < this.minParts - 1) {
+			            this.modalAlert.textContent = this.counter+ ` time. ` + `Too few users, please add at least ${this.minParts - checkedUsers - 1}.`;
+			            
+			        } else if (checkedUsers > this.maxParts - 1) {
+			            this.modalAlert.textContent = this.counter+ ` time. ` +  `Too much users, please remove at least ${checkedUsers - this.maxParts + 1}.`;
+			        	
+			        } else {
+			          			            
+			            // Add AJAX call to send the data to the server if needed
+			            
+			         	makeCall("POST", 'CreateGroup', null,
+					            function(req) {
+					              if (req.readyState == XMLHttpRequest.DONE) {
+					                var message = req.responseText; 
+					                if (req.status == 200) {
+										
+			
+										// Fill the modal window!
+
+					                } else if (req.status == 403) {
+					                  window.location.href = req.getResponseHeader("Location");
+					                  window.sessionStorage.removeItem('username');
+					              }
+					              else {
+					                  self.modalAlert.textContent = message;
+					                }
+					              }
+					            }
+					          );
+			            
+			            
+			        }
+										
+					
 				});
 
 	    
