@@ -23,7 +23,7 @@
 	   //			 FUNCTIONS OF THE HOMEPAGE Home Manager
 	    
 	   
-	    // 			1. Start(): show the things from the startup			TODO
+	    // 			1. Start(): show the things from the startup			
 	    this.start = function() {
 			
 			
@@ -57,23 +57,29 @@
 								);
 	      
 	      
-	      	// Construct the Wizard component								TODO
-	      //wizard = new Wizard(document.getElementById("id_createmissionform"), alertContainer);
-	      //wizard.registerEvents(this);  
+	      	// Construct the Wizard component								
+	      wizard = new Wizard(document.getElementById("modalAlert"),
+		      						document.getElementById("newGroupForm"), 
+		      						document.getElementById("myModal"),
+		      						document.getElementById("anagraficaTableBody")
+	      						);
+	      
 								  
 	    
 	    };
 
 
-		//		 2.	Refresh(): show the things while running				TODO
+		//		 2.	Refresh(): show the things while running				
 	    this.refresh = function() {     
+	      
+	      document.getElementById("id_alert").textContent = "";
 	      
 	      groupsLists.reset();
 	      groupsLists.show();
 	      
 	      groupDetails.reset();
 	      
-	      // wizard.reset();
+	      //wizard.reset();
 	      	      
 	    };
 	  }
@@ -284,7 +290,7 @@
 	  }
 	  
 	  
-	  		// --------3.  --------- ---- The Group Details ---- ------------------- TODO
+	  		// --------3.  --------- ---- The Group Details ---- ------------------- 
 	  		
 	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody, _bin) {
 	    this.alert = _alert;
@@ -517,9 +523,7 @@
             e.target.classList.remove('over');
         }
         
-       
-
-		// Handles the drop by removing the item from the list and displaying a message.
+        		// Handles the drop by removing the item from the list and displaying a message.
         function handleDrop (e, instance) {
             e.preventDefault();
             e.stopPropagation();
@@ -574,98 +578,158 @@
             	console.error('Drop handling failed:', err);
         	}
         };
-    
-    }
-	  
         
-
-
+       
+		}
+	
+	
+	// -------- 4.  --------- ---- The NewGroup Wizard ---- ------------------- 
 	  
-	  	// ------------4. ------------- The Wizzzzard ------------------------------ TODO
-	  
-	  function Wizard(wizardId, alert) {
+	  function Wizard(_modalAlert, _newGroupForm, _myModal, _anagraficaTableBody) {
+		  
+		  this.modalAlert = _modalAlert;
+		  this.newGroupForm = _newGroupForm;
+		  this.myModal = _myModal;
+		  this.anagraficaTableBody = _anagraficaTableBody;
+			  		  
 	    // minimum date the user can choose, in this case now and in the future
 	    var now = new Date(),
 	      formattedDate = now.toISOString().substring(0, 10);
-	    this.wizard = wizardId;
-	    this.alert = alert;
 
-	    this.wizard.querySelector('input[type="date"]').setAttribute("min", formattedDate);
 
-	    this.registerEvents = function(orchestrator) {
-	      // Manage previous and next buttons
-	      Array.from(this.wizard.querySelectorAll("input[type='button'].next,  input[type='button'].prev")).forEach(b => {
-	        b.addEventListener("click", (e) => { // arrow function preserve the
-	          // visibility of this
-	          var eventfieldset = e.target.closest("fieldset"),
-	            valid = true;
-	          if (e.target.className == "next") {
-	            for (i = 0; i < eventfieldset.elements.length; i++) {
-	              if (!eventfieldset.elements[i].checkValidity()) {
-	                eventfieldset.elements[i].reportValidity();
-	                valid = false;
-	                break;
-	              }
-	            }
-	          }
-	          if (valid) {
-	            this.changeStep(e.target.parentNode, (e.target.className === "next") ? e.target.parentNode.nextElementSibling : e.target.parentNode.previousElementSibling);
-	          }
-	        }, false);
-	      });
+	    this.newGroupForm.querySelector('input[type="date"]').setAttribute("min", formattedDate);
+
 
 	      // Manage submit button
-	      this.wizard.querySelector("input[type='button'].submit").addEventListener('click', (e) => {
-	        var eventfieldset = e.target.closest("fieldset"),
-	          valid = true;
-	        for (i = 0; i < eventfieldset.elements.length; i++) {
-	          if (!eventfieldset.elements[i].checkValidity()) {
-	            eventfieldset.elements[i].reportValidity();
-	            valid = false;
-	            break;
-	          }
-	        }
+	    this.newGroupForm.querySelector("input[type='submit']")
+	    	.addEventListener('click', (e) => {
+				
+				e.preventDefault();
+							
+				var errorMessage = document.getElementById("formErrMsg");		
+				
+						
+		        var eventfieldset = e.target.closest("fieldset"), valid = true;
+		        
+		        const minPartsInput = document.getElementById('minPartsForm');
+        		const maxPartsInput = document.getElementById('maxPartsForm');
+		        const minParts = parseInt(minPartsInput.value, 10);
+            	const maxParts = parseInt(maxPartsInput.value, 10);
+		        
+		        // Control for checking a correct number of participants limits.
+		        if(minParts > maxParts ) { 
+					valid = false; 
+					
+					errorMessage.style.display = 'block';
+					errorMessage.textContent = 
+						"Maximum participants must be greater or equal than minimum participants.";
+					return;
+				}
+		        
+		        if (valid) {
+					document.getElementById("formErrMsg").textContent = "";		
+						errorMessage.style.display = 'none';
+		          var self = this;
+		          
+		          
+		          // Show the modal window!
+		          self.changeWizView(newGroupForm, myModal);		          
+		          
+		          var creator = sessionStorage.getItem('username');
+		          
+		          // Get of the anagrafica users
+		          makeCall("GET", 'GetAnagraficaData?creator=' + creator, null,
+		            function(req) {
+		              if (req.readyState == XMLHttpRequest.DONE) {
+		                var message = req.responseText; 
+		                if (req.status == 200) {
+							
+							var users = JSON.parse(req.responseText);
+				            console.log("anagraficaData: ", users);
 
-	        if (valid) {
-	          var self = this;
-	          makeCall("POST", 'CreateMission', e.target.closest("form"),
-	            function(req) {
-	              if (req.readyState == XMLHttpRequest.DONE) {
-	                var message = req.responseText; // error message or mission id
-	                if (req.status == 200) {
-	                  orchestrator.refresh(message); // id of the new mission passed
-	                } else if (req.status == 403) {
-                      window.location.href = req.getResponseHeader("Location");
-                      window.sessionStorage.removeItem('username');
-                  }
-                  else {
-	                  self.alert.textContent = message;
-	                  self.reset();
-	                }
-	              }
-	            }
-	          );
-	        }
+							// Fill the modal window!
+		          			self.populateModal(users);	
+		                  
+		                } else if (req.status == 403) {
+		                  window.location.href = req.getResponseHeader("Location");
+		                  window.sessionStorage.removeItem('username');
+		              }
+		              else {
+		                  self.alert.textContent = message;
+		                }
+		              }
+		            }
+		          );
+		          
+		        }
 	      });
-	      // Manage cancel button
+	      
+	      
+	      
+/*	      // Manage cancel button
 	      this.wizard.querySelector("input[type='button'].cancel").addEventListener('click', (e) => {
 	        e.target.closest('form').reset();
 	        this.reset();
 	      });
-	    };
+	    */
 
 	    this.reset = function() {
-	      var fieldsets = document.querySelectorAll("#" + this.wizard.id + " fieldset");
-	      fieldsets[0].hidden = false;
-	      fieldsets[1].hidden = true;
-	      fieldsets[2].hidden = true;
-
+	      this.newGroupForm.reset();
+	      this.changeWizView(myModal, newGroupForm);
 	    }
 
-	    this.changeStep = function(origin, destination) {
-	      origin.hidden = true;
-	      destination.hidden = false;
+	    this.changeWizView = function(origin, destination) {
+			// Hide origin
+	      origin.style.display = "none";
+	      	// Then show destination
+	      destination.style.display = "block";
 	    }
+	    
+	    
+	    this.populateModal = function(users){
+			
+			var row, name, surname, username, check;
+	      
+	      // empty the table bodie
+	      this.anagraficaTableBody.innerHTML = "";
+
+	      // build updated list
+	      var self = this;
+		
+			
+			users.forEach(function(user) {
+	        
+		        // Create a new row for the entry
+		        row = document.createElement("tr");
+		        		        
+		        // Cell for the Surname
+		        surname = document.createElement("td");
+		        surname.textContent = user.surname;
+		        row.appendChild(surname);
+		        
+		        // Cell for the Name
+		        name = document.createElement("td");
+		        name.textContent = user.name;
+		        row.appendChild(name);
+		        
+		        // Cell for the Username
+		        username = document.createElement("td");
+		        username.textContent = user.username;
+		        row.appendChild(username);
+		        
+	
+				// TODO THE CHECKBOX
+		        
+	
+		        
+		        self.anagraficaTableBody.appendChild(row);
+	      });
+			          
+	          
+	          
+	          
+		}
+	    
 	  }
-	  
+	  	  
 };

@@ -21,31 +21,28 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.GroupDAO;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 
-@WebServlet("/Anagrafica")
-public class AnagraficaController extends HttpServlet {
+@WebServlet("/GetAnagraficaData")
+public class GetAnagraficaData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-    public AnagraficaController() {
+    public GetAnagraficaData() {
         super();
     }
 
 
     @Override
 	public void init() throws ServletException {
-			ServletContext servletContext = getServletContext();
-			ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-			templateResolver.setTemplateMode(TemplateMode.HTML);
-			this.templateEngine = new TemplateEngine();
-			this.templateEngine.setTemplateResolver(templateResolver);
-			templateResolver.setSuffix(".html");
 			connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
@@ -59,55 +56,58 @@ public class AnagraficaController extends HttpServlet {
     	String loginpath = getServletContext().getContextPath() + "/LandingPage.html";
     	HttpSession session = request.getSession();
     	if (session.isNew() || session.getAttribute("user") == null) {
-    		response.sendRedirect(loginpath);
+    		response.setStatus(403);
+    		response.setHeader("Location", loginpath);
     		return;
     	}
-    	User user = (User) session.getAttribute("user");
     	// End of Session persistency check
 
 
 
-
-    	// --------------- Counter check ---------------
-    	Integer counter = (Integer) session.getAttribute("counter");
-    	if(counter > 3 ) {
-
-    		// destroy session.Params
-    		removeSessionParams(session);
-
-    		// redirect to CANCELLAZIONE
-
-    		String path = "/WEB-INF/Cancellazione.html";
-    		ServletContext servletContext = getServletContext();
-    		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-    		templateEngine.process(path, ctx, response.getWriter());
-    		return;
-    	}
-    	// ------------- END of counter check -------------
+//    	// --------------- Counter check ---------------
+//    	Integer counter = (Integer) session.getAttribute("counter");
+//    	if(counter > 3 ) {
+//
+//    		// destroy session.Params
+//    		removeSessionParams(session);
+//
+//    		// redirect to CANCELLAZIONE
+//
+//    		String path = "/WEB-INF/Cancellazione.html";
+//    		ServletContext servletContext = getServletContext();
+//    		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+//    		templateEngine.process(path, ctx, response.getWriter());
+//    		return;
+//    	}
+//    	// ------------- END of counter check -------------
 
 
 
 
     	// Retrieving of group attributes from session COULD BE FROM THE REQUEST!!!
-
-		String title = (String) session.getAttribute("title");
-		Date startDate = (java.sql.Date) session.getAttribute("date");
-		Integer duration = (Integer) session.getAttribute("duration");
-		Integer minParts = (Integer) session.getAttribute("minParts");
-		Integer maxParts = (Integer) session.getAttribute("maxParts");
-		String creator = user.getUsername();
-
-		if (title == null || startDate == null || duration == null || minParts == null || maxParts == null || creator == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or absent param values");
+//		String title = (String) session.getAttribute("title");
+//		Date startDate = (java.sql.Date) session.getAttribute("date");
+//		Integer duration = (Integer) session.getAttribute("duration");
+//		Integer minParts = (Integer) session.getAttribute("minParts");
+//		Integer maxParts = (Integer) session.getAttribute("maxParts");
+//		String creator = user.getUsername();
+//
+//		if (title == null || startDate == null || duration == null || minParts == null || maxParts == null || creator == null) {
+//			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or absent param values");
+//			return;
+//		}
+    	
+    	
+		// get and check params
+		String creator = null;
+		try {
+			creator = request.getParameter("creator");
+		} catch (NumberFormatException | NullPointerException e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 
-
-
-
-		// Initialize the context variables to be shown by Thymeleaf
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 
 
 		// List of All Users for Anagrafica page: will be used by Thymeleaf!
@@ -115,10 +115,9 @@ public class AnagraficaController extends HttpServlet {
 		List<User> users = null;
 		try {
 			users = userDAO.findAllUsersExcept(creator);
-			ctx.setVariable("users", users);
-
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover all users");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to recover Users");
 			return;
 		}
 
@@ -127,35 +126,41 @@ public class AnagraficaController extends HttpServlet {
 		// Handling of the AlreadyInvitedUsers
 		// of the 1st time too
 
-    	List<String> alreadyInvitedUsers = null;
-
-    	// When Creator has selected some Users
-		try {
-
-			if(counter > 1)
-				// send the invitedUsers to Thymeleaf: if u.username is in invitedUsers, check V
-				alreadyInvitedUsers = (List<String>) session.getAttribute("alreadyInvitedUsers");
-
-
-			if(alreadyInvitedUsers == null) {
-				alreadyInvitedUsers = new ArrayList<>();
-				alreadyInvitedUsers.add("null");
-			}
-
-			System.out.println("doGet: " + alreadyInvitedUsers);
-
-			ctx.setVariable("alreadyInvitedUsers", alreadyInvitedUsers);
-			session.removeAttribute("alreadyInvitedUsers");
-
-		} catch (Exception e1) {
-			// None selected
-		}
-
-
+//    	List<String> alreadyInvitedUsers = null;
+//
+//    	// When Creator has selected some Users
+//		try {
+//
+//			if(counter > 1)
+//				// send the invitedUsers to Thymeleaf: if u.username is in invitedUsers, check V
+//				alreadyInvitedUsers = (List<String>) session.getAttribute("alreadyInvitedUsers");
+//
+//
+//			if(alreadyInvitedUsers == null) {
+//				alreadyInvitedUsers = new ArrayList<>();
+//				alreadyInvitedUsers.add("null");
+//			}
+//
+//			System.out.println("doGet: " + alreadyInvitedUsers);
+//
+//			ctx.setVariable("alreadyInvitedUsers", alreadyInvitedUsers);
+//			session.removeAttribute("alreadyInvitedUsers");
+//
+//		} catch (Exception e1) {
+//			// None selected
+//		}
 
 
-		String path = "/WEB-INF/Anagrafica.html";
-		templateEngine.process(path, ctx, response.getWriter());
+    	// Convert into JSON Data and send!
+    	Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+		String json = gson.toJson(users);
+    	
+
+    	response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
+		
+    	return;
 	}
 
 

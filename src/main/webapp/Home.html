@@ -92,9 +92,11 @@
 
 
 	<!-- 				GROUP CREATION 				 -->
-
-	<h3> // Create a new group! </h3>
+		<p id="formErrMsg" class="alertmessage"></p>
+	
+	<h3> // Create a new group! </h3> 
 	<div><form action="#" id="newGroupForm">
+	
 			<fieldset>
 				<p>
 					Group Title: <input type="text" name="title" required />
@@ -111,24 +113,29 @@
 				<p>
 					Maximum participants: <input type="number" name="maxParts" min=1 id="maxPartsForm" required />
 				</p>
-				<p id="formErrMsg"></p> 
-				<input id="newGroupButton" type="submit" name="Send">
+				
+				<input id="newGroupButton" type="submit" name="submit">
 			</fieldset>
 		</form></div>
 
 
     <!-- 					The Modal						-->
     <div id="myModal" class="modal">
+    
         <div class="modal-content">
-
-            <h3>Anagrafica</h3>
-
-            <table id="anagraficaTable">
+			<!-- <span class="close">&times;</span> -->
+			
+			
+			<div id="modalAlert" class="alertmessage"></div>
+            <input id="cancella" type="button" name="cancella" value="cancella" class="cancella">
+			<input id="invia" type="button" name="invia" value="invia" class="invia">
+			<h3> Anagrafica </h3>			
+            <table id="anagraficaTable">            
                 <thead>
                     <tr>
-                        <th>Name</th>
                         <th>Surname</th>
-                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Username</th>
                         <th>Select</th>
                     </tr>
                 </thead>
@@ -136,13 +143,10 @@
                     <!-- To be populated via AJAX -->
                 </tbody>
             </table>
-
-            <div class="button-group">
-                <button class="cancella">Cancella</button>
-                <button class="invia">Invia</button>
-            </div>
+            
 
         </div>
     </div>
+    
 </body>
 </html>
