@@ -61,6 +61,7 @@
 	      wizard = new Wizard(document.getElementById("modalAlert"),
 		      						document.getElementById("newGroupForm"), 
 		      						document.getElementById("myModal"),
+		      						document.getElementById("anagraficaDetails"),
 		      						document.getElementById("anagraficaTableBody")
 	      						);
 	      
@@ -585,12 +586,22 @@
 	
 	// -------- 4.  --------- ---- The NewGroup Wizard ---- ------------------- 
 	  
-	  function Wizard(_modalAlert, _newGroupForm, _myModal, _anagraficaTableBody) {
+	  function Wizard(_modalAlert, _newGroupForm, _myModal, _anagraficaDetails, _anagraficaTableBody) {
 		  
 		  this.modalAlert = _modalAlert;
 		  this.newGroupForm = _newGroupForm;
 		  this.myModal = _myModal;
 		  this.anagraficaTableBody = _anagraficaTableBody;
+		  this.anagraficaDetails = _anagraficaDetails;
+		  
+		  this.title = null;
+		  this.date = null;
+		  this.duration = null;
+		  this.minParts = null;
+		  this.maxParts = null;
+		  
+		  
+		  
 			  		  
 	    // minimum date the user can choose, in this case now and in the future
 	    var now = new Date(),
@@ -607,22 +618,32 @@
 				e.preventDefault();
 							
 				var errorMessage = document.getElementById("formErrMsg");		
-				
-						
-		        var eventfieldset = e.target.closest("fieldset"), valid = true;
+				var self = this;						
+		        var valid = true;
 		        
-		        const minPartsInput = document.getElementById('minPartsForm');
-        		const maxPartsInput = document.getElementById('maxPartsForm');
-		        const minParts = parseInt(minPartsInput.value, 10);
-            	const maxParts = parseInt(maxPartsInput.value, 10);
+		        self.title = document.getElementById('title').value;
+		        self.date = document.getElementById('date').value;
+		        self.duration = parseInt(document.getElementById('duration').value, 10);		        
+		        self.minParts = parseInt(document.getElementById('minPartsForm').value, 10);
+            	self.maxParts = parseInt(document.getElementById('maxPartsForm').value, 10);
 		        
 		        // Control for checking a correct number of participants limits.
-		        if(minParts > maxParts ) { 
+		        if(self.minParts > self.maxParts ) { 
 					valid = false; 
 					
 					errorMessage.style.display = 'block';
 					errorMessage.textContent = 
 						"Maximum participants must be greater or equal than minimum participants.";
+					return;
+				}
+				
+				if(self.title == "" || self.date == "" ||  self.duration === NaN.valueOf|| self.minParts === NaN || self.maxParts === NaN)
+				{
+					valid = false; 
+					
+					errorMessage.style.display = 'block';
+					errorMessage.textContent = 
+						"You got to fill these fields first!";
 					return;
 				}
 		        
@@ -688,13 +709,61 @@
 	    
 	    this.populateModal = function(users){
 			
-			var row, name, surname, username, check;
+			var row, cell, name, surname, username, check, checkCell;
 	      
 	      // empty the table bodie
 	      this.anagraficaTableBody.innerHTML = "";
+	      this.anagraficaDetails.innerHTML = "";
 
 	      // build updated list
 	      var self = this;
+	      
+	      // build the Details!
+	      row = document.createElement("tr");
+	      cell = document.createElement("td");
+	      cell.textContent = "Title: ";
+		  row.appendChild(cell);
+	      cell = document.createElement("td");
+	      cell.textContent = self.title;
+		  row.appendChild(cell);
+		  self.anagraficaDetails.appendChild(row);
+		  
+		  row = document.createElement("tr");
+	      cell = document.createElement("td");
+	      cell.textContent = "Start: ";
+		  row.appendChild(cell);
+	      cell = document.createElement("td");
+	      cell.textContent = self.date;
+		  row.appendChild(cell);
+		  self.anagraficaDetails.appendChild(row);
+		  
+		  row = document.createElement("tr");
+	      cell = document.createElement("td");
+	      cell.textContent = "Duration: ";
+		  row.appendChild(cell);
+	      cell = document.createElement("td");
+	      cell.textContent = self.duration;
+		  row.appendChild(cell);
+		  self.anagraficaDetails.appendChild(row);
+		  
+		  row = document.createElement("tr");
+	      cell = document.createElement("td");
+	      cell.textContent = "Minimum parts.: ";
+		  row.appendChild(cell);
+	      cell = document.createElement("td");
+	      cell.textContent = self.minParts;
+		  row.appendChild(cell);
+		  self.anagraficaDetails.appendChild(row);
+		  
+		  row = document.createElement("tr");
+	      cell = document.createElement("td");
+	      cell.textContent = "Maximum parts.: ";
+		  row.appendChild(cell);
+	      cell = document.createElement("td");
+	      cell.textContent = self.maxParts;
+		  row.appendChild(cell);
+		  self.anagraficaDetails.appendChild(row);
+		  
 		
 			
 			users.forEach(function(user) {
@@ -718,17 +787,39 @@
 		        row.appendChild(username);
 		        
 	
-				// TODO THE CHECKBOX
-		        
+				// Cell and Input for the CheckBox
+				checkCell = document.createElement('td');
+				check = document.createElement('input');
+				check.type = 'checkbox';
+	            check.name = 'username';
+	            check.value = user.username;
+	            checkCell.appendChild(check);
+	            row.appendChild(checkCell);
+						        
 	
 		        
 		        self.anagraficaTableBody.appendChild(row);
 	      });
 			          
 	          
-	          
-	          
+	  
 		}
+	  
+	  
+	  
+	        
+                // Close modal when the user clicks on Cancel button
+        document.getElementsByClassName("cancella")[0].addEventListener('click', (e) => 
+        		{
+					this.reset();
+				});
+        
+        document.getElementsByClassName("invia")[0].addEventListener('click', (e) => 
+        		{
+					// TODO the actual controls and sending!!
+					alert('Send button clicked!');
+				});
+
 	    
 	  }
 	  	  
