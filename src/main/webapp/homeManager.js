@@ -53,7 +53,8 @@
 			  					  document.getElementById("groupDetails"), 
 								  document.getElementById("groupDetailsBody"),
 								  document.getElementById("invitedUsersBody"),
-								  document.getElementById("bin")
+								  document.getElementById("bin"),
+								  this
 								);
 	      
 	      
@@ -62,7 +63,8 @@
 		      						document.getElementById("newGroupForm"), 
 		      						document.getElementById("myModal"),
 		      						document.getElementById("anagraficaDetails"),
-		      						document.getElementById("anagraficaTableBody")
+		      						document.getElementById("anagraficaTableBody"),
+		      						this
 	      						);
 	      
 								  
@@ -80,7 +82,7 @@
 	      
 	      groupDetails.reset();
 	      
-	      //wizard.reset();
+	      wizard.reset();
 	      	      
 	    };
 	  }
@@ -293,12 +295,14 @@
 	  
 	  		// --------3.  --------- ---- The Group Details ---- ------------------- 
 	  		
-	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody, _bin) {
+	  function GroupDetails(_alert, _groupDetails, _groupDetailsBody, _invitedUsersBody, _bin, _pageOrc) {
 	    this.alert = _alert;
 	    this.groupDetails = _groupDetails;
 	    this.groupDetailsBody = _groupDetailsBody;
 	    this.invitedUsersBody = _invitedUsersBody;
 	    this.bin = _bin;
+	    this.orchestrator = _pageOrc;
+	    
 	    this.minParts = null;
 	    this.parts = null;
 	    this.groupID = null;
@@ -556,7 +560,8 @@
 									  
 									  // IF EVERYTHING GOOD
 					                
-					                // modify the clientside parameters: shoul be done with refresh()
+					                instance.orchestrator.refresh();
+					                
 					                instance.show(instance.groupID);
 					                
 					                
@@ -586,13 +591,14 @@
 	
 	// -------- 4.  --------- ---- The NewGroup Wizard ---- ------------------- 
 	  
-	  function Wizard(_modalAlert, _newGroupForm, _myModal, _anagraficaDetails, _anagraficaTableBody) {
+	  function Wizard(_modalAlert, _newGroupForm, _myModal, _anagraficaDetails, _anagraficaTableBody, _pageOrc) {
 		  
 		  this.modalAlert = _modalAlert;
 		  this.newGroupForm = _newGroupForm;
 		  this.myModal = _myModal;
 		  this.anagraficaTableBody = _anagraficaTableBody;
 		  this.anagraficaDetails = _anagraficaDetails;
+		  this.orchestrator = _pageOrc;
 		  
 		  this.title = null;
 		  this.date = null;
@@ -820,6 +826,8 @@
 					var howManyChecked = checkedUsers.length;
 			        this.modalAlert.textContent = "";
 			        
+			        var self = this;
+			        
 			        console.log("Number of checked users: " + howManyChecked);
 			        console.log("Attempts of inserting group: " + this.counter);
 			        
@@ -855,15 +863,18 @@
 						                participants: selectedUsernames
 						            };
 			            
-			         	makeCall("POST", 'CreateGroup', JSON.stringify(requestData),
+			         	makeJSONCall("POST", 'CreateGroup', JSON.stringify(requestData),
 					            function(req) {
 					              if (req.readyState == XMLHttpRequest.DONE) {
 					                var message = req.responseText; 
 					                if (req.status == 200) {
 										
 										alert('Group correctly inserted!');
-										// Fill the modal window!
-										this.reset();							
+										
+										// Reset the view!
+										
+										self.reset();				
+										self.orchestrator.refresh();			
 										
 
 					                } else if (req.status == 403) {

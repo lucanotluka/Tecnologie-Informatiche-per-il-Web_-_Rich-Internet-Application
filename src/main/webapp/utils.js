@@ -23,3 +23,21 @@ function makeCall(method, url, formElement, cback, reset = true) {
         formElement.reset();
     }
 }
+
+function makeJSONCall(method, url, data, cback, reset = true) {
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            cback(req);
+        }
+    };
+
+    req.open(method, url);
+
+	 if (typeof data === 'string') {
+        req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        req.send(data);
+    } else {
+        req.send();
+    }
+}
